@@ -17,9 +17,12 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('EKWA_BAG_VERSION', '1.1.5');
+define('EKWA_BAG_VERSION', '1.2.5');
 define('EKWA_BAG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('EKWA_BAG_PLUGIN_URL', plugin_dir_url(__FILE__));
+
+// Include required files
+require_once EKWA_BAG_PLUGIN_DIR . 'includes/class-watermark.php';
 
 /**
  * Main Plugin Class
@@ -27,6 +30,11 @@ define('EKWA_BAG_PLUGIN_URL', plugin_dir_url(__FILE__));
 class EKWA_Before_After_Gallery {
     
     private static $instance = null;
+    
+    /**
+     * Watermark handler
+     */
+    private $watermark = null;
     
     /**
      * Get singleton instance
@@ -42,6 +50,7 @@ class EKWA_Before_After_Gallery {
      * Constructor
      */
     private function __construct() {
+        $this->watermark = new EKWA_BAG_Watermark();
         $this->init_hooks();
     }
     
@@ -64,12 +73,28 @@ class EKWA_Before_After_Gallery {
         add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
         add_action('save_post', array($this, 'save_meta_boxes'));
         
+        // Media library watermark status
+        add_filter('manage_media_columns', array($this, 'add_watermark_column'));
+        add_action('manage_media_custom_column', array($this, 'show_watermark_column'), 10, 2);
+        
         // Frontend hooks
         add_action('wp_enqueue_scripts', array($this, 'frontend_enqueue_scripts'));
+        add_action('wp_head', array($this, 'output_dynamic_css'));
         
         // AJAX hooks
         add_action('wp_ajax_ekwa_bag_get_cases', array($this, 'ajax_get_cases'));
         add_action('wp_ajax_nopriv_ekwa_bag_get_cases', array($this, 'ajax_get_cases'));
+        
+        // Watermark AJAX hooks
+        add_action('wp_ajax_ekwa_bag_bulk_watermark', array($this, 'ajax_bulk_watermark'));
+        add_action('wp_ajax_ekwa_bag_remove_watermarks', array($this, 'ajax_remove_watermarks'));
+        add_action('wp_ajax_ekwa_bag_export_settings', array($this, 'ajax_export_settings'));
+        add_action('wp_ajax_ekwa_bag_import_settings', array($this, 'ajax_import_settings'));
+        add_action('wp_ajax_ekwa_bag_test_watermark', array($this, 'ajax_test_watermark'));
+        add_action('wp_ajax_ekwa_bag_clear_and_reapply', array($this, 'ajax_clear_and_reapply'));
+        
+        // Auto-watermark scheduled event
+        add_action('ekwa_bag_auto_watermark', array($this, 'auto_watermark_case'));
     }
     
     /**
@@ -248,8 +273,15 @@ class EKWA_Before_After_Gallery {
         
         if ($post_type === 'ekwa_bag_case' || strpos($hook, 'ekwa-bag') !== false) {
             wp_enqueue_media();
+            
+            // Enqueue color picker for settings page
+            if (strpos($hook, 'ekwa-bag-settings') !== false) {
+                wp_enqueue_style('wp-color-picker');
+                wp_enqueue_script('wp-color-picker');
+            }
+            
             wp_enqueue_style('ekwa-bag-admin', EKWA_BAG_PLUGIN_URL . 'assets/css/admin.css', array(), EKWA_BAG_VERSION);
-            wp_enqueue_script('ekwa-bag-admin', EKWA_BAG_PLUGIN_URL . 'assets/js/admin.js', array('jquery', 'jquery-ui-sortable'), EKWA_BAG_VERSION, true);
+            wp_enqueue_script('ekwa-bag-admin', EKWA_BAG_PLUGIN_URL . 'assets/js/admin.js', array('jquery', 'jquery-ui-sortable', 'wp-color-picker'), EKWA_BAG_VERSION, true);
             
             wp_localize_script('ekwa-bag-admin', 'ekwaBagAdmin', array(
                 'ajaxUrl' => admin_url('admin-ajax.php'),
@@ -388,17 +420,86 @@ class EKWA_Before_After_Gallery {
                         $after_id = isset($set['after']) ? absint($set['after']) : 0;
                         
                         if ($before_id && $after_id) {
-                            $before_url = wp_get_attachment_image_url($before_id, 'large');
-                            if (!$before_url) $before_url = wp_get_attachment_image_url($before_id, 'full');
+                            // Debug watermark status
+                            $before_is_watermarked = $this->watermark ? $this->watermark->is_watermarked($before_id) : false;
+                            $after_is_watermarked = $this->watermark ? $this->watermark->is_watermarked($after_id) : false;
+                            
+                            error_log(sprintf(
+                                'EKWA Gallery Image Check: Before ID=%d (watermarked=%s), After ID=%d (watermarked=%s)',
+                                $before_id,
+                                $before_is_watermarked ? 'YES' : 'NO',
+                                $after_id,
+                                $after_is_watermarked ? 'YES' : 'NO'
+                            ));
+                            
+                            // Use watermarked URLs if available (with cache busting)
+                            $before_url = $this->watermark ? $this->watermark->get_display_url($before_id, 'large') : null;
+                            if (!$before_url) {
+                                $before_url = wp_get_attachment_image_url($before_id, 'large');
+                                if (!$before_url) $before_url = wp_get_attachment_image_url($before_id, 'full');
+                            }
 
-                            $after_url = wp_get_attachment_image_url($after_id, 'large');
-                            if (!$after_url) $after_url = wp_get_attachment_image_url($after_id, 'full');
+                            $after_url = $this->watermark ? $this->watermark->get_display_url($after_id, 'large') : null;
+                            if (!$after_url) {
+                                $after_url = wp_get_attachment_image_url($after_id, 'large');
+                                if (!$after_url) $after_url = wp_get_attachment_image_url($after_id, 'full');
+                            }
+                            
+                            error_log(sprintf(
+                                'EKWA Gallery URLs: Before=%s, After=%s',
+                                $before_url,
+                                $after_url
+                            ));
                             
                             if ($before_url && $after_url) {
+                                // Get image metadata for alt text and dimensions
+                                $before_alt = get_post_meta($before_id, '_wp_attachment_image_alt', true);
+                                $after_alt = get_post_meta($after_id, '_wp_attachment_image_alt', true);
+                                $before_meta = wp_get_attachment_metadata($before_id);
+                                $after_meta = wp_get_attachment_metadata($after_id);
+                                
+                                // Get dimensions for the 'large' size (or fall back to full size)
+                                $before_width = $before_height = $after_width = $after_height = '';
+                                
+                                if (!empty($before_meta['sizes']['large'])) {
+                                    $before_width = $before_meta['sizes']['large']['width'];
+                                    $before_height = $before_meta['sizes']['large']['height'];
+                                } elseif (!empty($before_meta['width']) && !empty($before_meta['height'])) {
+                                    $before_width = $before_meta['width'];
+                                    $before_height = $before_meta['height'];
+                                }
+                                
+                                if (!empty($after_meta['sizes']['large'])) {
+                                    $after_width = $after_meta['sizes']['large']['width'];
+                                    $after_height = $after_meta['sizes']['large']['height'];
+                                } elseif (!empty($after_meta['width']) && !empty($after_meta['height'])) {
+                                    $after_width = $after_meta['width'];
+                                    $after_height = $after_meta['height'];
+                                }
+                                
                                 $sets[] = array(
                                     'before' => $before_url,
                                     'after'  => $after_url,
+                                    'beforeAlt' => $before_alt ?: get_the_title($before_id),
+                                    'afterAlt' => $after_alt ?: get_the_title($after_id),
+                                    'beforeWidth' => $before_width,
+                                    'beforeHeight' => $before_height,
+                                    'afterWidth' => $after_width,
+                                    'afterHeight' => $after_height,
                                 );
+                                
+                                // Debug log
+                                error_log(sprintf(
+                                    'EKWA Gallery Set Data: Before=%s (alt=%s, %dx%d), After=%s (alt=%s, %dx%d)',
+                                    $before_url,
+                                    $before_alt ?: 'none',
+                                    $before_width,
+                                    $before_height,
+                                    $after_url,
+                                    $after_alt ?: 'none',
+                                    $after_width,
+                                    $after_height
+                                ));
                             }
                         }
                     }
@@ -583,6 +684,20 @@ class EKWA_Before_After_Gallery {
                 }
             }
             update_post_meta($post_id, '_ekwa_bag_image_sets', $image_sets);
+            
+            // Auto-apply watermarks if enabled - run directly
+            if ($this->watermark && $this->watermark->is_enabled()) {
+                $this->watermark->apply_watermarks_to_case($post_id);
+            }
+        }
+    }
+    
+    /**
+     * Auto-apply watermarks to case images
+     */
+    public function auto_watermark_case($post_id) {
+        if ($this->watermark && $this->watermark->is_enabled()) {
+            $this->watermark->apply_watermarks_to_case($post_id);
         }
     }
     
@@ -599,6 +714,236 @@ class EKWA_Before_After_Gallery {
             'cases'      => $cases,
             'categories' => $categories,
         ));
+    }
+    
+    /**
+     * Output dynamic CSS based on settings
+     */
+    public function output_dynamic_css() {
+        global $post;
+        if (!is_a($post, 'WP_Post') || !has_shortcode($post->post_content, 'ekwa_gallery')) {
+            return;
+        }
+        
+        $settings = get_option('ekwa_bag_settings', array());
+        $defaults = array(
+            'color_bg'          => '#f5f3f0',
+            'color_card_bg'     => '#ffffff',
+            'color_text'        => '#1a1a1a',
+            'color_text_soft'   => '#777777',
+            'color_accent'      => '#c9a87c',
+            'color_accent_dark' => '#b08d5b',
+            'color_border'      => '#e8e4df',
+        );
+        $settings = wp_parse_args($settings, $defaults);
+        
+        ?>
+        <style id="ekwa-bag-dynamic-css">
+            .ekwa-bag-wrapper {
+                --ekwa-bg: <?php echo esc_attr($settings['color_bg']); ?>;
+                --ekwa-card-bg: <?php echo esc_attr($settings['color_card_bg']); ?>;
+                --ekwa-text: <?php echo esc_attr($settings['color_text']); ?>;
+                --ekwa-text-soft: <?php echo esc_attr($settings['color_text_soft']); ?>;
+                --ekwa-accent: <?php echo esc_attr($settings['color_accent']); ?>;
+                --ekwa-accent-dark: <?php echo esc_attr($settings['color_accent_dark']); ?>;
+                --ekwa-border: <?php echo esc_attr($settings['color_border']); ?>;
+            }
+        </style>
+        <?php
+    }
+    
+    /**
+     * AJAX handler for bulk watermark
+     */
+    public function ajax_bulk_watermark() {
+        check_ajax_referer('ekwa_bag_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => __('Permission denied.', 'ekwa-before-after-gallery')));
+        }
+        
+        // Reload settings before bulk operation
+        $this->watermark->reload_settings();
+        
+        // Check if watermark is properly configured
+        if (!$this->watermark->is_enabled()) {
+            wp_send_json_error(array('message' => __('Watermark is not enabled. Please enable it in settings first.', 'ekwa-before-after-gallery')));
+        }
+        
+        $results = $this->watermark->bulk_apply_watermarks();
+        
+        // Include detailed error info
+        if (!empty($results['errors'])) {
+            $results['error_details'] = $results['errors'][0]['error'] ?? 'Unknown error';
+        }
+        
+        wp_send_json_success($results);
+    }
+    
+    /**
+     * AJAX handler for removing watermarks
+     */
+    public function ajax_remove_watermarks() {
+        check_ajax_referer('ekwa_bag_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => __('Permission denied.', 'ekwa-before-after-gallery')));
+        }
+        
+        $results = $this->watermark->bulk_remove_watermarks();
+        
+        wp_send_json_success($results);
+    }
+    
+    /**
+     * AJAX handler for exporting settings
+     */
+    public function ajax_export_settings() {
+        check_ajax_referer('ekwa_bag_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => __('Permission denied.', 'ekwa-before-after-gallery')));
+        }
+        
+        $settings = get_option('ekwa_bag_settings', array());
+        
+        wp_send_json_success(array(
+            'settings' => $settings,
+            'version'  => EKWA_BAG_VERSION,
+            'exported' => current_time('mysql'),
+        ));
+    }
+    
+    /**
+     * AJAX handler for importing settings
+     */
+    public function ajax_import_settings() {
+        check_ajax_referer('ekwa_bag_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => __('Permission denied.', 'ekwa-before-after-gallery')));
+        }
+        
+        $import_data = isset($_POST['import_data']) ? json_decode(stripslashes($_POST['import_data']), true) : null;
+        
+        if (!$import_data || !isset($import_data['settings'])) {
+            wp_send_json_error(array('message' => __('Invalid import file.', 'ekwa-before-after-gallery')));
+        }
+        
+        // Sanitize imported settings
+        $settings = array();
+        $allowed_keys = array(
+            'color_bg', 'color_card_bg', 'color_text', 'color_text_soft',
+            'color_accent', 'color_accent_dark', 'color_border',
+            'gallery_title', 'gallery_subtitle', 'cards_per_page',
+            'enable_lightbox', 'enable_lazy_load', 'image_quality',
+            'watermark_enabled', 'watermark_type', 'watermark_text',
+            'watermark_image', 'watermark_position', 'watermark_opacity',
+            'watermark_size', 'watermark_color', 'watermark_padding',
+        );
+        
+        foreach ($allowed_keys as $key) {
+            if (isset($import_data['settings'][$key])) {
+                if (strpos($key, 'color') !== false) {
+                    $settings[$key] = sanitize_hex_color($import_data['settings'][$key]);
+                } elseif (in_array($key, array('watermark_enabled', 'enable_lightbox', 'enable_lazy_load', 'watermark_image', 'cards_per_page', 'image_quality', 'watermark_opacity', 'watermark_size', 'watermark_padding'))) {
+                    $settings[$key] = absint($import_data['settings'][$key]);
+                } else {
+                    $settings[$key] = sanitize_text_field($import_data['settings'][$key]);
+                }
+            }
+        }
+        
+        update_option('ekwa_bag_settings', $settings);
+        
+        wp_send_json_success(array('message' => __('Settings imported successfully.', 'ekwa-before-after-gallery')));
+    }
+    
+    /**
+     * AJAX handler for testing watermark configuration
+     */
+    public function ajax_test_watermark() {
+        check_ajax_referer('ekwa_bag_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => __('Permission denied.', 'ekwa-before-after-gallery')));
+        }
+        
+        $this->watermark->reload_settings();
+        $settings = $this->watermark->get_settings();
+        
+        $status = array(
+            'library'     => $this->watermark->get_library() ?: 'none',
+            'is_available' => $this->watermark->is_available(),
+            'is_enabled'  => $this->watermark->is_enabled(),
+            'is_configured' => $this->watermark->is_configured(),
+            'type'        => $settings['watermark_type'],
+            'has_text'    => !empty($settings['watermark_text']),
+            'has_image'   => !empty($settings['watermark_image']),
+            'text'        => $settings['watermark_text'],
+            'image_id'    => $settings['watermark_image'],
+        );
+        
+        wp_send_json_success($status);
+    }
+    
+    /**
+     * AJAX handler for clearing and reapplying watermarks
+     */
+    public function ajax_clear_and_reapply() {
+        check_ajax_referer('ekwa_bag_admin_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error(array('message' => __('Permission denied.', 'ekwa-before-after-gallery')));
+        }
+        
+        // Get all gallery images
+        $image_ids = $this->watermark->get_gallery_image_ids();
+        
+        // Clear all watermark metadata first
+        foreach ($image_ids as $id) {
+            $this->watermark->remove_watermark($id);
+        }
+        
+        // Now apply watermarks fresh
+        $this->watermark->reload_settings();
+        $results = $this->watermark->bulk_apply_watermarks($image_ids);
+        
+        // Include detailed error info
+        if (!empty($results['errors'])) {
+            $results['error_details'] = $results['errors'][0]['error'] ?? 'Unknown error';
+        }
+        
+        wp_send_json_success($results);
+    }
+    
+    /**
+     * Add watermark column to media library
+     */
+    public function add_watermark_column($columns) {
+        $columns['watermark'] = __('Watermark', 'ekwa-before-after-gallery');
+        return $columns;
+    }
+    
+    /**
+     * Show watermark status in media library
+     */
+    public function show_watermark_column($column_name, $attachment_id) {
+        if ($column_name === 'watermark') {
+            if ($this->watermark->is_watermarked($attachment_id)) {
+                $info = $this->watermark->get_watermark_info($attachment_id);
+                if ($info['watermarked_exists']) {
+                    echo '<span style="color: #46b450;">✓ Watermarked</span><br>';
+                    echo '<small><a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" target="_blank">Original</a> | ';
+                    $wm_url = str_replace(wp_upload_dir()['basedir'], wp_upload_dir()['baseurl'], $info['watermarked_path']);
+                    echo '<a href="' . esc_url($wm_url) . '" target="_blank">Watermarked</a></small>';
+                } else {
+                    echo '<span style="color: #dc3232;">✗ Missing file</span>';
+                }
+            } else {
+                echo '<span style="color: #999;">—</span>';
+            }
+        }
     }
 }
 

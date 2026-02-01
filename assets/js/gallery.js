@@ -231,16 +231,24 @@
             let html = '';
 
             this.filtered.forEach(function(c, idx) {
+                const set = c.sets[0];
+                
+                // Debug log
+                console.log('Case set data:', set);
+                
+                const beforeAttrs = `src="${set.before}" alt="${set.beforeAlt || 'Before'}"${set.beforeWidth ? ` width="${set.beforeWidth}"` : ''}${set.beforeHeight ? ` height="${set.beforeHeight}"` : ''}`;
+                const afterAttrs = `src="${set.after}" alt="${set.afterAlt || 'After'}"${set.afterWidth ? ` width="${set.afterWidth}"` : ''}${set.afterHeight ? ` height="${set.afterHeight}"` : ''}`;
+                
                 html += `
                     <article class="ekwa-bag-stacked-card" data-id="${c.id}" style="animation-delay: ${idx * 0.08}s">
                         <div class="ekwa-bag-card-images">
                             <div class="ekwa-bag-card-img-wrapper">
-                                <img src="${c.sets[0].before}" alt="Before">
+                                <img ${beforeAttrs}>
                                 <span class="ekwa-bag-card-img-label">Before</span>
                             </div>
                             <div class="ekwa-bag-card-separator"></div>
                             <div class="ekwa-bag-card-img-wrapper after">
-                                <img src="${c.sets[0].after}" alt="After">
+                                <img ${afterAttrs}>
                                 <span class="ekwa-bag-card-img-label">After</span>
                             </div>
                         </div>
@@ -296,8 +304,18 @@
             this.$modalBreadcrumb.text(`${mainCatLabel} › ${subCatLabel}`);
             this.$modalTitle.text(this.currentCase.title);
             this.$modalDesc.html(`<p>${this.currentCase.desc}</p>`);
-            this.$modalBefore.attr('src', view.before);
-            this.$modalAfter.attr('src', view.after);
+            
+            // Update modal images with proper alt text and dimensions
+            this.$modalBefore.attr('src', view.before)
+                              .attr('alt', view.beforeAlt || 'Before');
+            if (view.beforeWidth) this.$modalBefore.attr('width', view.beforeWidth);
+            if (view.beforeHeight) this.$modalBefore.attr('height', view.beforeHeight);
+            
+            this.$modalAfter.attr('src', view.after)
+                             .attr('alt', view.afterAlt || 'After');
+            if (view.afterWidth) this.$modalAfter.attr('width', view.afterWidth);
+            if (view.afterHeight) this.$modalAfter.attr('height', view.afterHeight);
+            
             this.$modalViewCount.text(this.currentCase.sets.length);
             this.$modalCurrentNum.text(this.currentCaseIdx + 1);
             this.$modalTotalNum.text(this.filtered.length);
@@ -307,8 +325,8 @@
             this.currentCase.sets.forEach(function(s, i) {
                 thumbsHtml += `
                     <div class="ekwa-bag-modal-thumb ${i === self.currentViewIdx ? 'active' : ''}" data-idx="${i}">
-                        <img src="${s.before}" alt="Before">
-                        <img src="${s.after}" alt="After">
+                        <img src="${s.before}" alt="${s.beforeAlt || 'Before'}">
+                        <img src="${s.after}" alt="${s.afterAlt || 'After'}">
                     </div>
                 `;
             });

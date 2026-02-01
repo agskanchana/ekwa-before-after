@@ -290,8 +290,32 @@
 
 /* Settings Page */
 .ekwa-bag-settings {
-    max-width: 800px;
+    max-width: 900px;
     margin: 20px 20px 20px 0;
+}
+
+/* Tabs */
+.ekwa-bag-tabs {
+    margin-bottom: 0 !important;
+    border-bottom: 1px solid #c3c4c7;
+}
+
+.ekwa-bag-tabs .nav-tab {
+    margin-left: 0;
+    margin-right: 4px;
+}
+
+.ekwa-bag-tab-content {
+    display: none;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-top: none;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.ekwa-bag-tab-content.active {
+    display: block;
 }
 
 .ekwa-bag-settings-section {
@@ -302,13 +326,156 @@
     margin-bottom: 20px;
 }
 
+.ekwa-bag-tab-content .ekwa-bag-settings-section {
+    border: none;
+    padding: 0;
+    margin-bottom: 0;
+}
+
+.ekwa-bag-tab-content .ekwa-bag-settings-section + .ekwa-bag-settings-section {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid #eee;
+}
+
 .ekwa-bag-settings-section h2 {
     font-size: 18px;
-    margin: 0 0 20px;
+    margin: 0 0 10px;
     padding-bottom: 15px;
     border-bottom: 1px solid #eee;
 }
 
+.ekwa-bag-settings-section > p.description {
+    margin: -5px 0 20px;
+    color: #666;
+}
+
+/* Color Grid */
+.ekwa-bag-color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.ekwa-bag-color-field {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.ekwa-bag-color-field label {
+    display: block;
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.ekwa-bag-color-field .description {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #888;
+}
+
+.ekwa-bag-color-actions {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+/* Color Preview */
+.ekwa-bag-color-preview-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.ekwa-bag-color-preview-section h3 {
+    font-size: 14px;
+    margin: 0 0 15px;
+    color: #666;
+}
+
+.ekwa-bag-preview-box {
+    border-radius: 12px;
+    padding: 30px;
+    background: #f5f3f0;
+    transition: all 0.3s ease;
+}
+
+.ekwa-bag-preview-box .preview-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.ekwa-bag-preview-box .preview-header h4 {
+    font-size: 20px;
+    margin: 0 0 5px;
+    color: #1a1a1a;
+}
+
+.ekwa-bag-preview-box .preview-header p {
+    margin: 0;
+    color: #777;
+    font-size: 13px;
+}
+
+.ekwa-bag-preview-box .preview-tags {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.ekwa-bag-preview-box .preview-tag {
+    padding: 8px 16px;
+    background: #fff;
+    border: 1px solid #e8e4df;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #1a1a1a;
+    cursor: pointer;
+}
+
+.ekwa-bag-preview-box .preview-tag.active {
+    background: #c9a87c;
+    border-color: #c9a87c;
+    color: #fff;
+}
+
+.ekwa-bag-preview-box .preview-card {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    max-width: 300px;
+    margin: 0 auto;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.ekwa-bag-preview-box .preview-image {
+    height: 120px;
+    background: linear-gradient(135deg, #e8e4df 0%, #d0ccc7 100%);
+}
+
+.ekwa-bag-preview-box .preview-content {
+    padding: 15px;
+}
+
+.ekwa-bag-preview-box .preview-content h5 {
+    margin: 0 0 5px;
+    font-size: 14px;
+    color: #1a1a1a;
+}
+
+.ekwa-bag-preview-box .preview-content p {
+    margin: 0;
+    font-size: 12px;
+    color: #777;
+}
+
+/* Settings Rows */
 .ekwa-bag-settings-row {
     display: flex;
     align-items: flex-start;
@@ -320,10 +487,11 @@
     border-bottom: none;
 }
 
-.ekwa-bag-settings-row label {
+.ekwa-bag-settings-row > label {
     flex: 0 0 200px;
     font-weight: 600;
-    padding-top: 5px;
+    padding-top: 8px;
+    font-size: 14px;
 }
 
 .ekwa-bag-settings-row .ekwa-bag-field {
@@ -334,7 +502,7 @@
 .ekwa-bag-settings-row input[type="number"],
 .ekwa-bag-settings-row select {
     width: 100%;
-    max-width: 300px;
+    max-width: 350px;
     padding: 10px 12px;
     border: 1px solid #ddd;
     border-radius: 6px;
@@ -348,6 +516,347 @@
     color: #888;
 }
 
+/* Checkboxes */
+.ekwa-bag-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.ekwa-bag-checkbox:last-child {
+    margin-bottom: 0;
+}
+
+.ekwa-bag-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+/* Toggle Switch */
+.ekwa-bag-toggle {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.ekwa-bag-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.ekwa-bag-toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s;
+    border-radius: 26px;
+}
+
+.ekwa-bag-toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.ekwa-bag-toggle input:checked + .ekwa-bag-toggle-slider {
+    background-color: #c9a87c;
+}
+
+.ekwa-bag-toggle input:checked + .ekwa-bag-toggle-slider:before {
+    transform: translateX(24px);
+}
+
+.ekwa-bag-toggle input:disabled + .ekwa-bag-toggle-slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Radio Buttons */
+.ekwa-bag-radio-group {
+    display: flex;
+    gap: 20px;
+}
+
+.ekwa-bag-radio {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.ekwa-bag-radio input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+/* Watermark Options */
+.ekwa-bag-watermark-options {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.ekwa-bag-watermark-type-options {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+/* Watermark Image Field */
+.ekwa-bag-watermark-image-field {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.ekwa-bag-watermark-preview {
+    width: 120px;
+    height: 80px;
+    background: #f0f0f0;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.ekwa-bag-watermark-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.ekwa-bag-watermark-preview .no-image {
+    font-size: 11px;
+    color: #999;
+    text-align: center;
+    padding: 10px;
+}
+
+.ekwa-bag-watermark-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Position Grid */
+.ekwa-bag-position-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 40px);
+    gap: 5px;
+    background: #f0f0f0;
+    padding: 10px;
+    border-radius: 8px;
+    width: fit-content;
+}
+
+.ekwa-bag-position-option {
+    width: 40px;
+    height: 40px;
+    background: #fff;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.ekwa-bag-position-option:hover {
+    border-color: #c9a87c;
+}
+
+.ekwa-bag-position-option.active {
+    border-color: #c9a87c;
+    background: #c9a87c;
+}
+
+.ekwa-bag-position-option input {
+    display: none;
+}
+
+.ekwa-bag-position-option .position-dot {
+    width: 8px;
+    height: 8px;
+    background: #999;
+    border-radius: 50%;
+}
+
+.ekwa-bag-position-option.active .position-dot {
+    background: #fff;
+}
+
+/* Range Field */
+.ekwa-bag-range-field {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    max-width: 350px;
+}
+
+.ekwa-bag-range-field input[type="range"] {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    background: #ddd;
+    border-radius: 3px;
+    outline: none;
+}
+
+.ekwa-bag-range-field input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #c9a87c;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.ekwa-bag-range-field .range-value {
+    min-width: 45px;
+    text-align: right;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Warning Box */
+.ekwa-bag-warning-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: #fff8e5;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.ekwa-bag-warning-box .dashicons {
+    color: #ffc107;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+}
+
+.ekwa-bag-warning-box p {
+    margin: 0;
+    color: #856404;
+}
+
+/* Tool Box */
+.ekwa-bag-tool-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.ekwa-bag-tool-info h4 {
+    margin: 0 0 5px;
+    font-size: 14px;
+}
+
+.ekwa-bag-tool-info p {
+    margin: 0;
+    color: #666;
+    font-size: 13px;
+}
+
+.ekwa-bag-tool-box .button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.ekwa-bag-tool-box .button .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+/* Progress Section */
+.ekwa-bag-progress-section {
+    background: #f0f0f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.ekwa-bag-progress-bar {
+    height: 20px;
+    background: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.ekwa-bag-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #c9a87c, #b08d5b);
+    border-radius: 10px;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.ekwa-bag-progress-text {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #666;
+}
+
+/* System Info Table */
+.ekwa-bag-system-info {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ekwa-bag-system-info th,
+.ekwa-bag-system-info td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.ekwa-bag-system-info th {
+    width: 200px;
+    font-weight: 600;
+    color: #333;
+}
+
+.ekwa-bag-system-info .status-ok {
+    color: #46b450;
+    font-weight: 600;
+}
+
+.ekwa-bag-system-info .status-error {
+    color: #dc3232;
+    font-weight: 600;
+}
+
 .ekwa-bag-color-preview {
     display: inline-block;
     width: 30px;
@@ -356,6 +865,52 @@
     border: 1px solid #ddd;
     vertical-align: middle;
     margin-left: 10px;
+}
+
+/* Test Result Display */
+.ekwa-bag-test-result {
+    background: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin: 15px 0 20px;
+}
+
+.ekwa-bag-test-result h4 {
+    margin: 0 0 10px;
+    font-size: 14px;
+}
+
+.ekwa-bag-test-result ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.ekwa-bag-test-result li {
+    margin-bottom: 5px;
+}
+
+.ekwa-bag-test-result .warning {
+    color: #856404;
+    background: #fff3cd;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.ekwa-bag-test-result .success {
+    color: #155724;
+    background: #d4edda;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.ekwa-bag-test-result .error {
+    color: #721c24;
+    background: #f8d7da;
+    padding: 10px;
+    border-radius: 4px;
 }
 
 /* Responsive */
