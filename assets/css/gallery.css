@@ -1,0 +1,674 @@
+/**
+ * EKWA Before After Gallery - Frontend Styles
+ */
+
+.ekwa-bag-wrapper {
+    --ekwa-bg: #f5f3f0;
+    --ekwa-card-bg: #ffffff;
+    --ekwa-text: #1a1a1a;
+    --ekwa-text-soft: #777777;
+    --ekwa-accent: #c9a87c;
+    --ekwa-accent-dark: #b08d5b;
+    --ekwa-border: #e8e4df;
+    --ekwa-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    --ekwa-shadow-hover: 0 20px 50px rgba(0,0,0,0.12);
+}
+
+.ekwa-bag-wrapper * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.ekwa-bag-wrapper {
+    font-family: 'Poppins', sans-serif;
+    background: var(--ekwa-bg);
+    color: var(--ekwa-text);
+    line-height: 1.6;
+}
+
+/* Header */
+.ekwa-bag-header {
+    padding: 60px 40px 30px;
+    text-align: center;
+}
+
+.ekwa-bag-header h2 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 400;
+    margin-bottom: 12px;
+    color: var(--ekwa-text);
+}
+
+.ekwa-bag-header p {
+    color: var(--ekwa-text-soft);
+    font-size: 0.95rem;
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+/* Multi-Level Filter - Visual Tags */
+.ekwa-bag-filter-section {
+    padding: 30px 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.ekwa-bag-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.ekwa-bag-filter-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--ekwa-text-soft);
+}
+
+.ekwa-bag-tag-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.ekwa-bag-tag-btn {
+    padding: 10px 22px;
+    background: var(--ekwa-card-bg);
+    border: 1px solid var(--ekwa-border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ekwa-text);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ekwa-bag-tag-btn:hover {
+    border-color: var(--ekwa-accent);
+    background: #fffdf9;
+}
+
+.ekwa-bag-tag-btn.active {
+    background: var(--ekwa-accent);
+    border-color: var(--ekwa-accent);
+    color: #fff;
+}
+
+.ekwa-bag-tag-btn .ekwa-bag-tag-count {
+    margin-left: 6px;
+    opacity: 0.6;
+    font-size: 0.75rem;
+}
+
+.ekwa-bag-sub-tags {
+    display: none;
+    padding-top: 5px;
+}
+
+.ekwa-bag-sub-tags.visible {
+    display: flex;
+}
+
+.ekwa-bag-sub-tag-btn {
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--ekwa-border);
+    border-radius: 20px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    color: var(--ekwa-text-soft);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ekwa-bag-sub-tag-btn:hover {
+    color: var(--ekwa-text);
+    border-color: var(--ekwa-text-soft);
+}
+
+.ekwa-bag-sub-tag-btn.active {
+    background: var(--ekwa-text);
+    border-color: var(--ekwa-text);
+    color: #fff;
+}
+
+/* Results Info */
+.ekwa-bag-results-info {
+    text-align: center;
+    padding: 10px 40px 30px;
+    font-size: 0.85rem;
+    color: var(--ekwa-text-soft);
+}
+
+.ekwa-bag-results-info strong {
+    color: var(--ekwa-text);
+}
+
+.ekwa-bag-clear-btn {
+    margin-left: 15px;
+    padding: 6px 14px;
+    background: transparent;
+    border: 1px solid var(--ekwa-border);
+    border-radius: 15px;
+    font-family: inherit;
+    font-size: 0.75rem;
+    color: var(--ekwa-text-soft);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: none;
+}
+
+.ekwa-bag-clear-btn.visible {
+    display: inline-block;
+}
+
+.ekwa-bag-clear-btn:hover {
+    border-color: var(--ekwa-accent);
+    color: var(--ekwa-accent);
+}
+
+/* Card Grid */
+.ekwa-bag-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 30px;
+    padding: 0 40px 60px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Stacked Card Design */
+.ekwa-bag-stacked-card {
+    background: var(--ekwa-card-bg);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--ekwa-shadow);
+    cursor: pointer;
+    transition: all 0.4s ease;
+}
+
+.ekwa-bag-stacked-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--ekwa-shadow-hover);
+}
+
+/* Images Container - Stacked Vertically */
+.ekwa-bag-card-images {
+    display: flex;
+    flex-direction: column;
+}
+
+.ekwa-bag-card-img-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.ekwa-bag-card-img-wrapper img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+.ekwa-bag-stacked-card:hover .ekwa-bag-card-img-wrapper img {
+    transform: scale(1.05);
+}
+
+.ekwa-bag-card-img-label {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 5px 12px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--ekwa-text);
+}
+
+.ekwa-bag-card-img-wrapper.after .ekwa-bag-card-img-label {
+    background: var(--ekwa-accent);
+    color: #fff;
+}
+
+/* Separator Line */
+.ekwa-bag-card-separator {
+    height: 3px;
+    background: linear-gradient(90deg, var(--ekwa-accent) 0%, var(--ekwa-accent-dark) 100%);
+}
+
+/* Card Content */
+.ekwa-bag-card-content {
+    padding: 20px;
+}
+
+.ekwa-bag-card-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.15rem;
+    margin-bottom: 8px;
+    line-height: 1.4;
+    color: var(--ekwa-text);
+}
+
+.ekwa-bag-card-desc {
+    font-size: 0.85rem;
+    color: var(--ekwa-text-soft);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.ekwa-bag-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid var(--ekwa-border);
+}
+
+.ekwa-bag-card-views {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--ekwa-text-soft);
+}
+
+.ekwa-bag-card-views i {
+    color: var(--ekwa-accent);
+}
+
+.ekwa-bag-card-action {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--ekwa-accent-dark);
+    transition: all 0.3s ease;
+}
+
+.ekwa-bag-stacked-card:hover .ekwa-bag-card-action {
+    gap: 10px;
+}
+
+/* Modal */
+.ekwa-bag-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s ease;
+}
+
+.ekwa-bag-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.ekwa-bag-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(8px);
+}
+
+.ekwa-bag-modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 950px;
+    max-height: 90vh;
+    background: var(--ekwa-card-bg);
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95) translateY(20px);
+    transition: transform 0.4s ease;
+}
+
+.ekwa-bag-modal.active .ekwa-bag-modal-content {
+    transform: scale(1) translateY(0);
+}
+
+/* Modal Header */
+.ekwa-bag-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 25px 25px 20px;
+    border-bottom: 1px solid var(--ekwa-border);
+}
+
+.ekwa-bag-modal-header-info {
+    flex: 1;
+}
+
+.ekwa-bag-modal-breadcrumb {
+    font-size: 0.75rem;
+    color: var(--ekwa-accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.ekwa-bag-modal-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.5rem;
+    line-height: 1.3;
+    color: var(--ekwa-text);
+}
+
+.ekwa-bag-modal-close {
+    width: 40px;
+    height: 40px;
+    background: var(--ekwa-bg);
+    border: none;
+    border-radius: 50%;
+    font-size: 1rem;
+    color: var(--ekwa-text);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ekwa-bag-modal-close:hover {
+    background: var(--ekwa-text);
+    color: #fff;
+}
+
+/* Modal Body */
+.ekwa-bag-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 25px;
+}
+
+/* Modal Images - Side by Side */
+.ekwa-bag-modal-images {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.ekwa-bag-modal-img-box {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.ekwa-bag-modal-img-box img {
+    width: 100%;
+    height: 280px;
+    object-fit: cover;
+    display: block;
+}
+
+.ekwa-bag-modal-img-tag {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ekwa-bag-modal-img-box.after .ekwa-bag-modal-img-tag {
+    background: var(--ekwa-accent);
+    color: #fff;
+}
+
+/* Modal Description */
+.ekwa-bag-modal-desc {
+    background: var(--ekwa-bg);
+    padding: 18px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+.ekwa-bag-modal-desc p {
+    font-size: 0.9rem;
+    color: var(--ekwa-text-soft);
+    line-height: 1.7;
+    margin: 0;
+}
+
+.ekwa-bag-modal-desc::-webkit-scrollbar {
+    width: 4px;
+}
+
+.ekwa-bag-modal-desc::-webkit-scrollbar-thumb {
+    background: var(--ekwa-accent);
+    border-radius: 2px;
+}
+
+/* Modal Thumbnails */
+.ekwa-bag-modal-thumbs-section {
+    margin-bottom: 10px;
+}
+
+.ekwa-bag-modal-thumbs-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--ekwa-text-soft);
+    margin-bottom: 12px;
+}
+
+.ekwa-bag-modal-thumbs {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.ekwa-bag-modal-thumbs::-webkit-scrollbar {
+    height: 4px;
+}
+
+.ekwa-bag-modal-thumbs::-webkit-scrollbar-thumb {
+    background: var(--ekwa-accent);
+    border-radius: 2px;
+}
+
+.ekwa-bag-modal-thumb {
+    flex-shrink: 0;
+    display: flex;
+    gap: 4px;
+    padding: 5px;
+    background: var(--ekwa-bg);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ekwa-bag-modal-thumb:hover {
+    border-color: var(--ekwa-border);
+}
+
+.ekwa-bag-modal-thumb.active {
+    border-color: var(--ekwa-accent);
+}
+
+.ekwa-bag-modal-thumb img {
+    width: 45px;
+    height: 35px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+/* Modal Footer */
+.ekwa-bag-modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    background: var(--ekwa-bg);
+    border-top: 1px solid var(--ekwa-border);
+}
+
+.ekwa-bag-modal-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background: var(--ekwa-card-bg);
+    border: 1px solid var(--ekwa-border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--ekwa-text);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ekwa-bag-modal-nav-btn:hover:not(:disabled) {
+    background: var(--ekwa-text);
+    border-color: var(--ekwa-text);
+    color: #fff;
+}
+
+.ekwa-bag-modal-nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.ekwa-bag-modal-counter {
+    font-size: 0.85rem;
+    color: var(--ekwa-text-soft);
+}
+
+.ekwa-bag-modal-counter strong {
+    color: var(--ekwa-accent-dark);
+}
+
+/* Empty State */
+.ekwa-bag-empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 80px 40px;
+}
+
+.ekwa-bag-empty-state i {
+    font-size: 3rem;
+    color: var(--ekwa-border);
+    margin-bottom: 20px;
+}
+
+.ekwa-bag-empty-state h3 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+    color: var(--ekwa-text);
+}
+
+.ekwa-bag-empty-state p {
+    color: var(--ekwa-text-soft);
+}
+
+/* Loading State */
+.ekwa-bag-loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 40px;
+}
+
+.ekwa-bag-loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid var(--ekwa-border);
+    border-top-color: var(--ekwa-accent);
+    border-radius: 50%;
+    animation: ekwa-bag-spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes ekwa-bag-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .ekwa-bag-modal-images {
+        grid-template-columns: 1fr;
+    }
+
+    .ekwa-bag-modal-img-box img {
+        height: 220px;
+    }
+}
+
+@media (max-width: 600px) {
+    .ekwa-bag-header, .ekwa-bag-filter-section {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .ekwa-bag-card-grid {
+        padding: 0 20px 40px;
+        gap: 20px;
+    }
+
+    .ekwa-bag-card-img-wrapper img {
+        height: 150px;
+    }
+
+    .ekwa-bag-modal {
+        padding: 15px;
+    }
+
+    .ekwa-bag-modal-header, .ekwa-bag-modal-body, .ekwa-bag-modal-footer {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+
+/* Animations */
+.ekwa-bag-stacked-card {
+    animation: ekwa-bag-cardSlideUp 0.5s ease forwards;
+    opacity: 0;
+}
+
+@keyframes ekwa-bag-cardSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

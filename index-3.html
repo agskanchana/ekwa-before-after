@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dental Gallery | Stacked Cards</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #f5f3f0;
+            --card-bg: #ffffff;
+            --text: #1a1a1a;
+            --text-soft: #777777;
+            --accent: #c9a87c;
+            --accent-dark: #b08d5b;
+            --border: #e8e4df;
+            --shadow: 0 8px 30px rgba(0,0,0,0.06);
+            --shadow-hover: 0 20px 50px rgba(0,0,0,0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .gallery-header {
+            padding: 60px 40px 30px;
+            text-align: center;
+        }
+
+        .gallery-header h1 {
+            font-family: 'Libre Baskerville', serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 400;
+            margin-bottom: 12px;
+        }
+
+        .gallery-header p {
+            color: var(--text-soft);
+            font-size: 0.95rem;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        /* Multi-Level Filter - Visual Tags */
+        .filter-section {
+            padding: 30px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .filter-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-soft);
+        }
+
+        .tag-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tag-btn {
+            padding: 10px 22px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tag-btn:hover {
+            border-color: var(--accent);
+            background: #fffdf9;
+        }
+
+        .tag-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .tag-btn .tag-count {
+            margin-left: 6px;
+            opacity: 0.6;
+            font-size: 0.75rem;
+        }
+
+        .sub-tags {
+            display: none;
+            padding-top: 5px;
+        }
+
+        .sub-tags.visible {
+            display: flex;
+        }
+
+        .sub-tag-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            color: var(--text-soft);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .sub-tag-btn:hover {
+            color: var(--text);
+            border-color: var(--text-soft);
+        }
+
+        .sub-tag-btn.active {
+            background: var(--text);
+            border-color: var(--text);
+            color: #fff;
+        }
+
+        /* Results Info */
+        .results-info {
+            text-align: center;
+            padding: 10px 40px 30px;
+            font-size: 0.85rem;
+            color: var(--text-soft);
+        }
+
+        .results-info strong {
+            color: var(--text);
+        }
+
+        .clear-btn {
+            margin-left: 15px;
+            padding: 6px 14px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            font-family: inherit;
+            font-size: 0.75rem;
+            color: var(--text-soft);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: none;
+        }
+
+        .clear-btn.visible {
+            display: inline-block;
+        }
+
+        .clear-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Card Grid */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            padding: 0 40px 60px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Stacked Card Design */
+        .stacked-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .stacked-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Images Container - Stacked Vertically */
+        .card-images {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-img-wrapper {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-img-wrapper img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .stacked-card:hover .card-img-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .card-img-label {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 5px 12px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text);
+        }
+
+        .card-img-wrapper.after .card-img-label {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* Separator Line */
+        .card-separator {
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-dark) 100%);
+        }
+
+        /* Card Content */
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-title {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1.15rem;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .card-desc {
+            font-size: 0.85rem;
+            color: var(--text-soft);
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        .card-views {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--text-soft);
+        }
+
+        .card-views i {
+            color: var(--accent);
+        }
+
+        .card-action {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--accent-dark);
+            transition: all 0.3s ease;
+        }
+
+        .stacked-card:hover .card-action {
+            gap: 10px;
+        }
+
+        /* Modal */
+        .gallery-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .gallery-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            position: relative;
+            width: 100%;
+            max-width: 950px;
+            max-height: 90vh;
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transform: scale(0.95) translateY(20px);
+            transition: transform 0.4s ease;
+        }
+
+        .gallery-modal.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Modal Header */
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 25px 25px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header-info {
+            flex: 1;
+        }
+
+        .modal-breadcrumb {
+            font-size: 0.75rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .modal-title {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1.5rem;
+            line-height: 1.3;
+        }
+
+        .modal-close {
+            width: 40px;
+            height: 40px;
+            background: var(--bg);
+            border: none;
+            border-radius: 50%;
+            font-size: 1rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .modal-close:hover {
+            background: var(--text);
+            color: #fff;
+        }
+
+        /* Modal Body */
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+        }
+
+        /* Modal Images - Side by Side */
+        .modal-images {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-img-box {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .modal-img-box img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .modal-img-tag {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-img-box.after .modal-img-tag {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* Modal Description */
+        .modal-desc {
+            background: var(--bg);
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .modal-desc p {
+            font-size: 0.9rem;
+            color: var(--text-soft);
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .modal-desc::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .modal-desc::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        /* Modal Thumbnails */
+        .modal-thumbs-section {
+            margin-bottom: 10px;
+        }
+
+        .modal-thumbs-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-soft);
+            margin-bottom: 12px;
+        }
+
+        .modal-thumbs {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .modal-thumbs::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .modal-thumbs::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 2px;
+        }
+
+        .modal-thumb {
+            flex-shrink: 0;
+            display: flex;
+            gap: 4px;
+            padding: 5px;
+            background: var(--bg);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-thumb:hover {
+            border-color: var(--border);
+        }
+
+        .modal-thumb.active {
+            border-color: var(--accent);
+        }
+
+        .modal-thumb img {
+            width: 45px;
+            height: 35px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        /* Modal Footer */
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+        }
+
+        .modal-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-nav-btn:hover:not(:disabled) {
+            background: var(--text);
+            border-color: var(--text);
+            color: #fff;
+        }
+
+        .modal-nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .modal-counter {
+            font-size: 0.85rem;
+            color: var(--text-soft);
+        }
+
+        .modal-counter strong {
+            color: var(--accent-dark);
+        }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 80px 40px;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--border);
+            margin-bottom: 20px;
+        }
+
+        .empty-state h3 {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: var(--text-soft);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .modal-images {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-img-box img {
+                height: 220px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .gallery-header, .filter-section {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .card-grid {
+                padding: 0 20px 40px;
+                gap: 20px;
+            }
+
+            .card-img-wrapper img {
+                height: 150px;
+            }
+
+            .gallery-modal {
+                padding: 15px;
+            }
+
+            .modal-header, .modal-body, .modal-footer {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
+
+        /* Animations */
+        .stacked-card {
+            animation: cardSlideUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes cardSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="gallery-header">
+        <h1>Smile Transformations</h1>
+        <p>Browse our dental treatment gallery with full before and after views</p>
+    </header>
+
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <div class="filter-row">
+            <span class="filter-label">Category:</span>
+            <div class="tag-group" id="mainTags">
+                <!-- Rendered by JS -->
+            </div>
+        </div>
+        <div class="filter-row sub-tags" id="subTags">
+            <!-- Rendered by JS -->
+        </div>
+    </div>
+
+    <!-- Results Info -->
+    <div class="results-info">
+        Showing <strong id="resultsCount">12</strong> transformations
+        <button class="clear-btn" id="clearBtn">Clear</button>
+    </div>
+
+    <!-- Card Grid -->
+    <div class="card-grid" id="cardGrid">
+        <!-- Rendered by JS -->
+    </div>
+
+    <!-- Modal -->
+    <div class="gallery-modal" id="galleryModal">
+        <div class="modal-backdrop" id="modalBackdrop"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-header-info">
+                    <div class="modal-breadcrumb" id="modalBreadcrumb">Cosmetic › Veneers</div>
+                    <h2 class="modal-title" id="modalTitle">Treatment Title</h2>
+                </div>
+                <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-images" id="modalImages">
+                    <div class="modal-img-box">
+                        <img id="modalBefore" src="" alt="Before">
+                        <span class="modal-img-tag">Before</span>
+                    </div>
+                    <div class="modal-img-box after">
+                        <img id="modalAfter" src="" alt="After">
+                        <span class="modal-img-tag">After</span>
+                    </div>
+                </div>
+                <div class="modal-desc" id="modalDesc">
+                    <p>Description here...</p>
+                </div>
+                <div class="modal-thumbs-section">
+                    <div class="modal-thumbs-label">All Views (<span id="modalViewCount">3</span>)</div>
+                    <div class="modal-thumbs" id="modalThumbs">
+                        <!-- Rendered by JS -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-nav-btn" id="modalPrev"><i class="fas fa-chevron-left"></i> Previous</button>
+                <div class="modal-counter">
+                    <strong id="modalCurrentNum">1</strong> / <span id="modalTotalNum">12</span>
+                </div>
+                <button class="modal-nav-btn" id="modalNext">Next <i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data with multi-level categories
+        const cases = [
+            {
+                id: 1, title: "Professional LED Whitening",
+                mainCat: "cosmetic", subCat: "whitening",
+                desc: "Advanced LED whitening achieving 10 shades brighter in a single 90-minute session. Long-lasting results that transformed this patient's confidence.",
+                sets: [
+                    { before: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800", after: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=800" },
+                    { before: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=800", after: "https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=800" },
+                    { before: "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=800", after: "https://images.unsplash.com/photo-1606265752439-1f18756aa5fc?w=800" }
+                ]
+            },
+            {
+                id: 2, title: "Hollywood Porcelain Veneers",
+                mainCat: "cosmetic", subCat: "veneers",
+                desc: "Ultra-thin custom veneers handcrafted to match natural teeth. Perfect symmetry and shade matching for a celebrity-worthy smile.",
+                sets: [
+                    { before: "https://images.unsplash.com/photo-1595436173617-75305881ade1?w=800", after: "https://images.unsplash.com/photo-1600170311833-c2cf5280ce49?w=800" },
+                    { before: "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=800", after: "https://images.unsplash.com/photo-1603807008857-ad66b70431aa?w=800" },
+                    { before: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=800", after: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=800" },
+                    { before: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800", after: "https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=800" }
+                ]
+            },
+            {
+                id: 3, title: "Precision Zirconia Crown",
+                mainCat: "restorative", subCat: "crowns",
+                desc: "Full-arch restoration with monolithic zirconia. 3D scanned and precision milled for perfect fit and natural appearance.",
+                sets: [
+                    { before: "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=800", after: "https://images.unsplash.com/photo-1600170311833-c2cf5280ce49?w=800" },
+                    { before: "https://images.unsplash.com/photo-1595436173617-75305881ade1?w=800", after: "https://images.unsplash.com/photo-1606265752439-1f18756aa5fc?w=800" },
+                    { before: "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=800", after: "https://images.unsplash.com/photo-1603807008857-ad66b70431aa?w=800" }
+                ]
+            },
+            {
+                id: 4, title: "Single Tooth Implant",
+                mainCat: "restorative", subCat: "implants",
+                desc: "Titanium implant with custom abutment and e.max crown. Seamless natural integration with surrounding teeth.",
+                sets: [
+                    { before: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=800", after: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=800" },
+                    { before: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800", after: "https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=800" }
+                ]
+            },
+            {
+                id: 5, title: "Premium BPS Dentures",
+                mainCat: "restorative", subCat: "dentures",
+                desc: "BPS denture system with characterized gingival tones. Undetectable natural-looking prosthetics that restore confidence.",
+                sets: [
+                    { before: "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=800", after: "https://images.unsplash.com/photo-1600170311833-c2cf5280ce49?w=800" },
+                    { before: "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=800", after: "https://images.unsplash.com/photo-1606265752439-1f18756aa5fc?w=800" },
+                    { before: "https://images.unsplash.com/photo-1595436173617-75305881ade1?w=800", after: "https://images.unsplash.com/photo-1603807008857-ad66b70431aa?w=800" }
+                ]
+            },
+            {
+                id: 6, title: "Invisalign Clear Aligners",
+                mainCat: "orthodontic", subCat: "aligners",
+                desc: "14-month clear aligner treatment. 24 custom trays for perfect alignment without metal braces.",
+                sets: [
+                    { before: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=800", after: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=800" },
+                    { before: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800", after: "https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=800" },
+                    { before: "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=800", after: "https://images.unsplash.com/photo-1600170311833-c2cf5280ce49?w=800" },
+                    { before: "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=800", after: "https://images.unsplash.com/photo-1606265752439-1f18756aa5fc?w=800" },
+                    { before: "https://images.unsplash.com/photo-1595436173617-75305881ade1?w=800", after: "https://images.unsplash.com/photo-1603807008857-ad66b70431aa?w=800" }
+                ]
+            },
+            {
+                id: 7, title: "CEREC Same-Day Crown",
+                mainCat: "restorative", subCat: "crowns",
+                desc: "CEREC technology for scan-to-seat in 2 hours. Perfect shade and marginal integrity.",
+                sets: [
+                    { before: "https://images.unsplash.com/photo-1595436173617-75305881ade1?w=800", after: "https://images.unsplash.com/photo-1603807008857-ad66b70431aa?w=800" },
+                    { before: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=800", after: "https://images.unsplash.com/photo-1600170311833-c2cf5280ce49?w=800" }
+                ]
+            },
+            {
+                id: 8, title: "All-on-4 Full Arch Implants",
+                mainCat: "restorative", subCat: "implants",
+                desc: "Complete arch restoration on 4 implants. Same-day fixed provisional prosthesis for immediate results.",
+                sets: [
+                    { before: "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=800", after: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=800" },
+                    { before: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800", after: "https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=800" },
+                    { before: "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=800", after: "https://images.unsplash.com/photo-1606265752439-1f18756aa5fc?w=800" },
+                    { before: "https://images.unsplash.com/photo-1595436173617-75305881ade1?w=800", after: "https://images.unsplash.com/photo-1600170311833-c2cf5280ce49?w=800" }
+                ]
+            },
+            {
+                id: 9, title: "Whitening & Composite Bonding",
+                mainCat: "cosmetic", subCat: "whitening",
+                desc: "Combined whitening with composite bonding. Minimally invasive complete smile refresh.",
+                sets: [
+                    { before: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=800", after: "https://images.unsplash.com/photo-1603807008857-ad66b70431aa?w=800" },
+                    { before: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800", after: "https://images.unsplash.com/photo-1600170311833-c2cf5280ce49?w=800" },
+                    { before: "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=800", after: "https://images.unsplash.com/photo-1606265752439-1f18756aa5fc?w=800" }
+                ]
+            },
+            {
+                id: 10, title: "Minimal Prep Veneers",
+                mainCat: "cosmetic", subCat: "veneers",
+                desc: "Ultra-conservative veneer preparation preserving maximum tooth structure. Natural-looking aesthetic enhancement.",
+                sets: [
+                    { before: "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=800", after: "https://images.unsplash.com/photo-1606265752439-1f18756aa5fc?w=800" },
+                    { before: "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=800", after: "https://images.unsplash.com/photo-1603807008857-ad66b70431aa?w=800" }
+                ]
+            },
+            {
+                id: 11, title: "Ceramic Braces Journey",
+                mainCat: "orthodontic", subCat: "braces",
+                desc: "18-month treatment with tooth-colored ceramic brackets. Discreet orthodontic correction for adults.",
+                sets: [
+                    { before: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800", after: "https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=800" },
+                    { before: "https://images.unsplash.com/photo-1595436173617-75305881ade1?w=800", after: "https://images.unsplash.com/photo-1600170311833-c2cf5280ce49?w=800" },
+                    { before: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=800", after: "https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=800" }
+                ]
+            },
+            {
+                id: 12, title: "Implant-Supported Denture",
+                mainCat: "restorative", subCat: "dentures",
+                desc: "Snap-on denture secured by 2 implants. Enhanced stability and comfort compared to traditional dentures.",
+                sets: [
+                    { before: "https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=800", after: "https://images.unsplash.com/photo-1603807008857-ad66b70431aa?w=800" },
+                    { before: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=800", after: "https://images.unsplash.com/photo-1600170311833-c2cf5280ce49?w=800" }
+                ]
+            }
+        ];
+
+        // Category structure
+        const categoryTree = {
+            all: { label: 'All', subCats: [] },
+            cosmetic: { 
+                label: 'Cosmetic',
+                subCats: [
+                    { key: 'whitening', label: 'Whitening' },
+                    { key: 'veneers', label: 'Veneers' }
+                ]
+            },
+            restorative: { 
+                label: 'Restorative',
+                subCats: [
+                    { key: 'crowns', label: 'Crowns' },
+                    { key: 'implants', label: 'Implants' },
+                    { key: 'dentures', label: 'Dentures' }
+                ]
+            },
+            orthodontic: { 
+                label: 'Orthodontic',
+                subCats: [
+                    { key: 'aligners', label: 'Clear Aligners' },
+                    { key: 'braces', label: 'Braces' }
+                ]
+            }
+        };
+
+        // State
+        let activeMainCat = 'all';
+        let activeSubCat = null;
+        let filtered = [...cases];
+        let currentCase = null;
+        let currentCaseIdx = 0;
+        let currentViewIdx = 0;
+
+        // DOM
+        const $ = id => document.getElementById(id);
+
+        // Render main category tags
+        function renderMainTags() {
+            const container = $('mainTags');
+            container.innerHTML = Object.entries(categoryTree).map(([key, cat]) => {
+                const count = key === 'all' ? cases.length : cases.filter(c => c.mainCat === key).length;
+                return `
+                    <button class="tag-btn ${activeMainCat === key ? 'active' : ''}" data-cat="${key}">
+                        ${cat.label}<span class="tag-count">${count}</span>
+                    </button>
+                `;
+            }).join('');
+
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    activeMainCat = btn.dataset.cat;
+                    activeSubCat = null;
+                    renderMainTags();
+                    renderSubTags();
+                    filterCases();
+                });
+            });
+        }
+
+        // Render sub category tags
+        function renderSubTags() {
+            const container = $('subTags');
+            const cat = categoryTree[activeMainCat];
+
+            if (!cat.subCats || cat.subCats.length === 0) {
+                container.classList.remove('visible');
+                return;
+            }
+
+            container.innerHTML = `
+                <span class="filter-label">Refine:</span>
+                <div class="tag-group">
+                    <button class="sub-tag-btn ${!activeSubCat ? 'active' : ''}" data-sub="all">All</button>
+                    ${cat.subCats.map(sub => `
+                        <button class="sub-tag-btn ${activeSubCat === sub.key ? 'active' : ''}" data-sub="${sub.key}">${sub.label}</button>
+                    `).join('')}
+                </div>
+            `;
+
+            container.classList.add('visible');
+
+            document.querySelectorAll('.sub-tag-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    activeSubCat = btn.dataset.sub === 'all' ? null : btn.dataset.sub;
+                    renderSubTags();
+                    filterCases();
+                });
+            });
+        }
+
+        // Filter cases
+        function filterCases() {
+            if (activeMainCat === 'all') {
+                filtered = [...cases];
+            } else if (activeSubCat) {
+                filtered = cases.filter(c => c.mainCat === activeMainCat && c.subCat === activeSubCat);
+            } else {
+                filtered = cases.filter(c => c.mainCat === activeMainCat);
+            }
+
+            $('resultsCount').textContent = filtered.length;
+            $('clearBtn').classList.toggle('visible', activeMainCat !== 'all');
+            renderGrid();
+        }
+
+        // Render card grid
+        function renderGrid() {
+            const container = $('cardGrid');
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>No Results Found</h3>
+                        <p>Try selecting a different category</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map((c, idx) => `
+                <article class="stacked-card" data-id="${c.id}" style="animation-delay: ${idx * 0.08}s">
+                    <div class="card-images">
+                        <div class="card-img-wrapper">
+                            <img src="${c.sets[0].before}" alt="Before">
+                            <span class="card-img-label">Before</span>
+                        </div>
+                        <div class="card-separator"></div>
+                        <div class="card-img-wrapper after">
+                            <img src="${c.sets[0].after}" alt="After">
+                            <span class="card-img-label">After</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">${c.title}</h3>
+                        <p class="card-desc">${c.desc}</p>
+                        <div class="card-footer">
+                            <div class="card-views">
+                                <i class="fas fa-layer-group"></i>
+                                ${c.sets.length} views
+                            </div>
+                            <span class="card-action">
+                                View All <i class="fas fa-arrow-right"></i>
+                            </span>
+                        </div>
+                    </div>
+                </article>
+            `).join('');
+
+            document.querySelectorAll('.stacked-card').forEach(card => {
+                card.addEventListener('click', () => openModal(parseInt(card.dataset.id)));
+            });
+        }
+
+        // Open modal
+        function openModal(id) {
+            currentCase = cases.find(c => c.id === id);
+            currentCaseIdx = filtered.findIndex(c => c.id === id);
+            currentViewIdx = 0;
+            $('galleryModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+            updateModal();
+        }
+
+        // Update modal content
+        function updateModal() {
+            const view = currentCase.sets[currentViewIdx];
+            const mainCatLabel = categoryTree[currentCase.mainCat].label;
+            const subCatLabel = categoryTree[currentCase.mainCat].subCats.find(s => s.key === currentCase.subCat)?.label || '';
+
+            $('modalBreadcrumb').textContent = `${mainCatLabel} › ${subCatLabel}`;
+            $('modalTitle').textContent = currentCase.title;
+            $('modalDesc').innerHTML = `<p>${currentCase.desc}</p>`;
+            $('modalBefore').src = view.before;
+            $('modalAfter').src = view.after;
+            $('modalViewCount').textContent = currentCase.sets.length;
+            $('modalCurrentNum').textContent = currentCaseIdx + 1;
+            $('modalTotalNum').textContent = filtered.length;
+
+            // Thumbnails
+            $('modalThumbs').innerHTML = currentCase.sets.map((s, i) => `
+                <div class="modal-thumb ${i === currentViewIdx ? 'active' : ''}" data-idx="${i}">
+                    <img src="${s.before}" alt="Before">
+                    <img src="${s.after}" alt="After">
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.modal-thumb').forEach(thumb => {
+                thumb.addEventListener('click', () => {
+                    currentViewIdx = parseInt(thumb.dataset.idx);
+                    updateModal();
+                });
+            });
+
+            // Nav buttons
+            $('modalPrev').disabled = currentCaseIdx === 0;
+            $('modalNext').disabled = currentCaseIdx === filtered.length - 1;
+        }
+
+        // Close modal
+        function closeModal() {
+            $('galleryModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Navigate cases
+        function navCase(dir) {
+            if (dir === -1 && currentCaseIdx > 0) currentCaseIdx--;
+            else if (dir === 1 && currentCaseIdx < filtered.length - 1) currentCaseIdx++;
+            currentCase = filtered[currentCaseIdx];
+            currentViewIdx = 0;
+            updateModal();
+        }
+
+        // Event listeners
+        $('modalClose').addEventListener('click', closeModal);
+        $('modalBackdrop').addEventListener('click', closeModal);
+        $('modalPrev').addEventListener('click', () => navCase(-1));
+        $('modalNext').addEventListener('click', () => navCase(1));
+        $('clearBtn').addEventListener('click', () => {
+            activeMainCat = 'all';
+            activeSubCat = null;
+            renderMainTags();
+            renderSubTags();
+            filterCases();
+        });
+
+        document.addEventListener('keydown', e => {
+            if (!$('galleryModal').classList.contains('active')) return;
+            if (e.key === 'Escape') closeModal();
+            if (e.key === 'ArrowLeft') navCase(-1);
+            if (e.key === 'ArrowRight') navCase(1);
+        });
+
+        // Initialize
+        renderMainTags();
+        renderSubTags();
+        filterCases();
+    </script>
+</body>
+</html>
