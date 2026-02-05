@@ -345,6 +345,7 @@ class EKWA_Before_After_Gallery {
         // Get settings for card design
         $settings = get_option('ekwa_bag_settings', array());
         $card_design = isset($settings['card_design']) ? $settings['card_design'] : 'stacked';
+        $show_labels = isset($settings['show_before_after_labels']) ? $settings['show_before_after_labels'] : 1;
         
         // Use inline script to pass data reliably
         $json_data = json_encode(array(
@@ -353,6 +354,7 @@ class EKWA_Before_After_Gallery {
             'cases'      => $cases,
             'categories' => $categories,
             'cardDesign' => $card_design,
+            'showLabels' => $show_labels,
             'debug'      => $this->get_debug_info(),
         ));
         
@@ -421,8 +423,66 @@ class EKWA_Before_After_Gallery {
                 
                 if (!empty($image_sets) && is_array($image_sets)) {
                     foreach ($image_sets as $set) {
-                        $before_id = isset($set['before']) ? absint($set['before']) : 0;
-                        $after_id = isset($set['after']) ? absint($set['after']) : 0;
+                        // Check if this is a single combined image or separate before/after
+                        if (isset($set['single_image'])) {
+                            // Single combined image mode - use same image for both before and after
+                            $single_id = absint($set['single_image']);
+                            
+                            if ($single_id) {
+                                $is_watermarked = $this->watermark ? $this->watermark->is_watermarked($single_id) : false;
+                                
+                                error_log(sprintf(
+                                    'EKWA Gallery Single Image Check: ID=%d (watermarked=%s)',
+                                    $single_id,
+                                    $is_watermarked ? 'YES' : 'NO'
+                                ));
+                                
+                                // Use watermarked URL if available
+                                $image_url = $this->watermark ? $this->watermark->get_display_url($single_id, 'large') : null;
+                                if (!$image_url) {
+                                    $image_url = wp_get_attachment_image_url($single_id, 'large');
+                                    if (!$image_url) $image_url = wp_get_attachment_image_url($single_id, 'full');
+                                }
+                                
+                                if ($image_url) {
+                                    $image_alt = get_post_meta($single_id, '_wp_attachment_image_alt', true);
+                                    $image_meta = wp_get_attachment_metadata($single_id);
+                                    
+                                    $image_width = $image_height = '';
+                                    if (!empty($image_meta['sizes']['large'])) {
+                                        $image_width = $image_meta['sizes']['large']['width'];
+                                        $image_height = $image_meta['sizes']['large']['height'];
+                                    } elseif (!empty($image_meta['width']) && !empty($image_meta['height'])) {
+                                        $image_width = $image_meta['width'];
+                                        $image_height = $image_meta['height'];
+                                    }
+                                    
+                                    // Use the single combined image
+                                    $sets[] = array(
+                                        'before' => $image_url,
+                                        'after'  => $image_url,
+                                        'beforeAlt' => $image_alt ?: get_the_title($single_id),
+                                        'afterAlt' => $image_alt ?: get_the_title($single_id),
+                                        'beforeWidth' => $image_width,
+                                        'beforeHeight' => $image_height,
+                                        'afterWidth' => $image_width,
+                                        'afterHeight' => $image_height,
+                                        'isCombined' => true,
+                                    );
+                                    
+                                    error_log(sprintf(
+                                        'EKWA Gallery Single Image Data: URL=%s (alt=%s, %dx%d)',
+                                        $image_url,
+                                        $image_alt ?: 'none',
+                                        $image_width,
+                                        $image_height
+                                    ));
+                                }
+                            }
+                        } else {
+                            // Separate before/after images mode
+                            $before_id = isset($set['before']) ? absint($set['before']) : 0;
+                            $after_id = isset($set['after']) ? absint($set['after']) : 0;
                         
                         if ($before_id && $after_id) {
                             // Debug watermark status
@@ -507,6 +567,7 @@ class EKWA_Before_After_Gallery {
                                 ));
                             }
                         }
+                        } // End of else block for separate before/after images
                     }
                 }
                 
@@ -652,8 +713,17 @@ class EKWA_Before_After_Gallery {
     public function render_image_sets_meta_box($post) {
         wp_nonce_field('ekwa_bag_save_meta', 'ekwa_bag_meta_nonce');
         $image_sets = get_post_meta($post->ID, '_ekwa_bag_image_sets', true);
+        
+        // Get the pair_as_one_image setting
+        $settings = get_option('ekwa_bag_settings', array());
+        $pair_as_one_image = isset($settings['pair_as_one_image']) ? $settings['pair_as_one_image'] : 0;
+        
         if (empty($image_sets)) {
-            $image_sets = array(array('before' => '', 'after' => ''));
+            if ($pair_as_one_image) {
+                $image_sets = array(array('single_image' => ''));
+            } else {
+                $image_sets = array(array('before' => '', 'after' => ''));
+            }
         }
         include EKWA_BAG_PLUGIN_DIR . 'includes/admin/meta-box-image-sets.php';
     }
@@ -679,13 +749,26 @@ class EKWA_Before_After_Gallery {
         
         // Save image sets
         if (isset($_POST['ekwa_bag_image_sets'])) {
+            $settings = get_option('ekwa_bag_settings', array());
+            $pair_as_one_image = isset($settings['pair_as_one_image']) ? $settings['pair_as_one_image'] : 0;
+            
             $image_sets = array();
             foreach ($_POST['ekwa_bag_image_sets'] as $set) {
-                if (!empty($set['before']) || !empty($set['after'])) {
-                    $image_sets[] = array(
-                        'before' => absint($set['before']),
-                        'after'  => absint($set['after']),
-                    );
+                if ($pair_as_one_image) {
+                    // Single combined image mode
+                    if (!empty($set['single_image'])) {
+                        $image_sets[] = array(
+                            'single_image' => absint($set['single_image']),
+                        );
+                    }
+                } else {
+                    // Separate before/after images mode
+                    if (!empty($set['before']) || !empty($set['after'])) {
+                        $image_sets[] = array(
+                            'before' => absint($set['before']),
+                            'after'  => absint($set['after']),
+                        );
+                    }
                 }
             }
             update_post_meta($post_id, '_ekwa_bag_image_sets', $image_sets);

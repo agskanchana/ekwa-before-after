@@ -245,6 +245,11 @@
     color: #fff;
 }
 
+/* Hide labels when disabled - Cards */
+.ekwa-bag-wrapper[data-show-labels="0"] .ekwa-bag-card-img-label {
+    display: none;
+}
+
 /* Separator Line */
 .ekwa-bag-card-separator {
     height: 3px;
@@ -445,6 +450,98 @@
 .ekwa-bag-modal-img-box.after .ekwa-bag-modal-img-tag {
     background: var(--ekwa-accent);
     color: #fff;
+}
+
+/* Combined Image Mode - Modal */
+.ekwa-bag-modal-images.ekwa-bag-combined-modal {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+    position: relative;
+}
+
+.ekwa-bag-modal-images.ekwa-bag-combined-modal .ekwa-bag-modal-img-box {
+    max-width: 100%;
+}
+
+.ekwa-bag-modal-images.ekwa-bag-combined-modal .ekwa-bag-modal-img-box.after {
+    display: none;
+}
+
+.ekwa-bag-modal-images.ekwa-bag-combined-modal .ekwa-bag-modal-img-tag {
+    display: none;
+}
+
+/* Show Before/After labels for combined images when enabled */
+.ekwa-bag-modal-images.ekwa-bag-combined-modal:not(.ekwa-bag-no-labels) .ekwa-bag-modal-img-box::before,
+.ekwa-bag-modal-images.ekwa-bag-combined-modal:not(.ekwa-bag-no-labels) .ekwa-bag-modal-img-box::after {
+    content: attr(data-label);
+    position: absolute;
+    bottom: 12px;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    z-index: 2;
+}
+
+.ekwa-bag-modal-images.ekwa-bag-combined-modal:not(.ekwa-bag-no-labels) .ekwa-bag-modal-img-box::before {
+    content: 'Before';
+    left: 12px;
+}
+
+.ekwa-bag-modal-images.ekwa-bag-combined-modal:not(.ekwa-bag-no-labels) .ekwa-bag-modal-img-box::after {
+    content: 'After';
+    right: 12px;
+    background: var(--ekwa-accent);
+    color: #fff;
+}
+
+/* Hide labels when disabled in settings */
+.ekwa-bag-modal-images.ekwa-bag-no-labels .ekwa-bag-modal-img-tag {
+    display: none;
+}
+
+/* Combined Image Mode - Cards */
+.ekwa-bag-combined-image {
+    display: block !important;
+}
+
+.ekwa-bag-combined-image .ekwa-bag-card-img-wrapper.combined {
+    width: 100%;
+    position: relative;
+}
+
+.ekwa-bag-combined-image .ekwa-bag-card-img-wrapper.combined img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Combined image labels - positioned left and right */
+.ekwa-bag-combined-image .ekwa-bag-card-img-label.left {
+    left: 12px;
+    right: auto;
+}
+
+.ekwa-bag-combined-image .ekwa-bag-card-img-label.right {
+    right: 12px;
+    left: auto;
+    background: var(--ekwa-accent);
+    color: #fff;
+}
+
+/* Combined Image Mode - Thumbnails */
+.ekwa-bag-combined-thumb {
+    width: auto;
+}
+
+.ekwa-bag-combined-thumb img {
+    width: 100%;
+    max-width: 100px;
+    height: auto;
 }
 
 /* Modal Description */

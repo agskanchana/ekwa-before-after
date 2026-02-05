@@ -191,6 +191,22 @@
     gap: 20px;
 }
 
+.ekwa-bag-image-set-content.single-image-mode {
+    grid-template-columns: 1fr;
+}
+
+.ekwa-bag-single-image-field {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.ekwa-bag-single-image-field .description {
+    text-align: center;
+    font-size: 12px;
+    color: #666;
+    margin-top: 10px;
+}
+
 .ekwa-bag-image-field {
     text-align: center;
 }

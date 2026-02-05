@@ -8,6 +8,8 @@ if (!defined('ABSPATH')) {
 }
 
 $show_filter = $atts['show_filter'] === 'yes';
+$settings = get_option('ekwa_bag_settings', array());
+$show_labels = isset($settings['show_before_after_labels']) ? $settings['show_before_after_labels'] : 1;
 
 // Debug output
 echo '<!-- EKWA DEBUG START -->';
@@ -17,7 +19,7 @@ echo '<!-- Categories data: ' . esc_html(print_r($categories, true)) . ' -->';
 echo '<!-- EKWA DEBUG END -->';
 ?>
 
-<div class="ekwa-bag-wrapper">
+<div class="ekwa-bag-wrapper" data-show-labels="<?php echo esc_attr($show_labels); ?>">
     <?php if ($show_filter) : ?>
     <!-- Filter Section -->
     <div class="ekwa-bag-filter-section">

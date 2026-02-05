@@ -829,6 +829,11 @@ class EKWA_BAG_Watermark {
             
             if (!empty($image_sets) && is_array($image_sets)) {
                 foreach ($image_sets as $set) {
+                    // Handle combined image mode
+                    if (!empty($set['single_image'])) {
+                        $image_ids[] = absint($set['single_image']);
+                    }
+                    // Handle separate before/after mode
                     if (!empty($set['before'])) {
                         $image_ids[] = absint($set['before']);
                     }
@@ -860,7 +865,17 @@ class EKWA_BAG_Watermark {
         $results = array('success' => 0, 'skipped' => 0, 'failed' => 0, 'errors' => array());
         
         foreach ($image_sets as $set) {
-            foreach (array('before', 'after') as $type) {
+            // Determine which keys to check based on image set structure
+            $image_keys = array();
+            if (isset($set['single_image'])) {
+                // Combined image mode
+                $image_keys = array('single_image');
+            } else {
+                // Separate before/after mode
+                $image_keys = array('before', 'after');
+            }
+            
+            foreach ($image_keys as $type) {
                 if (!empty($set[$type])) {
                     $attachment_id = absint($set[$type]);
                     

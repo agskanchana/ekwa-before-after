@@ -28,11 +28,13 @@
                 this.cases = ekwaBagFrontend.cases || [];
                 this.categoryTree = ekwaBagFrontend.categories || {};
                 this.cardDesign = ekwaBagFrontend.cardDesign || 'stacked';
+                this.showLabels = ekwaBagFrontend.showLabels !== undefined ? ekwaBagFrontend.showLabels : 1;
                 this.filtered = [...this.cases];
                 
                 // Debug logging
                 console.log('EKWA Gallery initialized with', this.cases.length, 'cases');
                 console.log('Card design:', this.cardDesign);
+                console.log('Show labels:', this.showLabels);
                 console.log('Cases data:', this.cases);
                 console.log('Categories:', this.categoryTree);
                 
@@ -244,26 +246,49 @@
 
             this.filtered.forEach(function(c, idx) {
                 const set = c.sets[0];
+                const isCombined = set.isCombined || false;
                 
                 // Debug log
-                console.log('Case set data:', set);
+                console.log('Case set data:', set, 'isCombined:', isCombined);
                 
                 const beforeAttrs = `src="${set.before}" alt="${set.beforeAlt || 'Before'}"${set.beforeWidth ? ` width="${set.beforeWidth}"` : ''}${set.beforeHeight ? ` height="${set.beforeHeight}"` : ''}`;
                 const afterAttrs = `src="${set.after}" alt="${set.afterAlt || 'After'}"${set.afterWidth ? ` width="${set.afterWidth}"` : ''}${set.afterHeight ? ` height="${set.afterHeight}"` : ''}`;
                 
-                html += `
-                    <article class="${cardClass}" data-id="${c.id}" style="animation-delay: ${idx * 0.08}s">
+                // Generate card images HTML based on combined mode
+                let cardImagesHtml;
+                if (isCombined) {
+                    // Single combined image - show labels on left and right if enabled
+                    const beforeLabel = self.showLabels ? '<span class="ekwa-bag-card-img-label left">Before</span>' : '';
+                    const afterLabel = self.showLabels ? '<span class="ekwa-bag-card-img-label right">After</span>' : '';
+                    cardImagesHtml = `
+                        <div class="ekwa-bag-card-images ekwa-bag-combined-image">
+                            <div class="ekwa-bag-card-img-wrapper combined">
+                                <img ${beforeAttrs}>
+                                ${beforeLabel}
+                                ${afterLabel}
+                            </div>
+                        </div>`;
+                } else {
+                    // Separate before/after images
+                    const beforeLabel = self.showLabels ? '<span class="ekwa-bag-card-img-label">Before</span>' : '';
+                    const afterLabel = self.showLabels ? '<span class="ekwa-bag-card-img-label">After</span>' : '';
+                    cardImagesHtml = `
                         <div class="ekwa-bag-card-images">
                             <div class="ekwa-bag-card-img-wrapper">
                                 <img ${beforeAttrs}>
-                                <span class="ekwa-bag-card-img-label">Before</span>
+                                ${beforeLabel}
                             </div>
                             <div class="ekwa-bag-card-separator"></div>
                             <div class="ekwa-bag-card-img-wrapper after">
                                 <img ${afterAttrs}>
-                                <span class="ekwa-bag-card-img-label">After</span>
+                                ${afterLabel}
                             </div>
-                        </div>
+                        </div>`;
+                }
+                
+                html += `
+                    <article class="${cardClass}${isCombined ? ' ekwa-bag-combined-card' : ''}" data-id="${c.id}" style="animation-delay: ${idx * 0.08}s">
+                        ${cardImagesHtml}
                         <div class="ekwa-bag-card-content">
                             <h3 class="ekwa-bag-card-title">${c.title}</h3>
                             <p class="ekwa-bag-card-desc">${c.desc}</p>
@@ -309,6 +334,7 @@
         updateModal() {
             const self = this;
             const view = this.currentCase.sets[this.currentViewIdx];
+            const isCombined = view.isCombined || false;
             const mainCatLabel = this.categoryTree[this.currentCase.mainCat]?.label || '';
             const subCatObj = this.categoryTree[this.currentCase.mainCat]?.subCats?.find(s => s.key === this.currentCase.subCat);
             const subCatLabel = subCatObj?.label || '';
@@ -317,16 +343,41 @@
             this.$modalTitle.text(this.currentCase.title);
             this.$modalDesc.html(`<p>${this.currentCase.desc}</p>`);
             
-            // Update modal images with proper alt text and dimensions
-            this.$modalBefore.attr('src', view.before)
-                              .attr('alt', view.beforeAlt || 'Before');
-            if (view.beforeWidth) this.$modalBefore.attr('width', view.beforeWidth);
-            if (view.beforeHeight) this.$modalBefore.attr('height', view.beforeHeight);
-            
-            this.$modalAfter.attr('src', view.after)
-                             .attr('alt', view.afterAlt || 'After');
-            if (view.afterWidth) this.$modalAfter.attr('width', view.afterWidth);
-            if (view.afterHeight) this.$modalAfter.attr('height', view.afterHeight);
+            // Handle combined vs separate image display
+            const $modalImages = $('#ekwa-bag-modalImages');
+            if (isCombined) {
+                // Single combined image - hide after image box and expand before to full width
+                $modalImages.addClass('ekwa-bag-combined-modal');
+                if (!this.showLabels) {
+                    $modalImages.addClass('ekwa-bag-no-labels');
+                } else {
+                    $modalImages.removeClass('ekwa-bag-no-labels');
+                }
+                
+                this.$modalBefore.attr('src', view.before)
+                                  .attr('alt', view.beforeAlt || 'Combined Before/After');
+                if (view.beforeWidth) this.$modalBefore.attr('width', view.beforeWidth);
+                if (view.beforeHeight) this.$modalBefore.attr('height', view.beforeHeight);
+            } else {
+                // Separate before/after images
+                $modalImages.removeClass('ekwa-bag-combined-modal');
+                if (!this.showLabels) {
+                    $modalImages.addClass('ekwa-bag-no-labels');
+                } else {
+                    $modalImages.removeClass('ekwa-bag-no-labels');
+                }
+                
+                // Update modal images with proper alt text and dimensions
+                this.$modalBefore.attr('src', view.before)
+                                  .attr('alt', view.beforeAlt || 'Before');
+                if (view.beforeWidth) this.$modalBefore.attr('width', view.beforeWidth);
+                if (view.beforeHeight) this.$modalBefore.attr('height', view.beforeHeight);
+                
+                this.$modalAfter.attr('src', view.after)
+                                 .attr('alt', view.afterAlt || 'After');
+                if (view.afterWidth) this.$modalAfter.attr('width', view.afterWidth);
+                if (view.afterHeight) this.$modalAfter.attr('height', view.afterHeight);
+            }
             
             this.$modalViewCount.text(this.currentCase.sets.length);
             this.$modalCurrentNum.text(this.currentCaseIdx + 1);
@@ -335,12 +386,23 @@
             // Thumbnails
             let thumbsHtml = '';
             this.currentCase.sets.forEach(function(s, i) {
-                thumbsHtml += `
-                    <div class="ekwa-bag-modal-thumb ${i === self.currentViewIdx ? 'active' : ''}" data-idx="${i}">
-                        <img src="${s.before}" alt="${s.beforeAlt || 'Before'}">
-                        <img src="${s.after}" alt="${s.afterAlt || 'After'}">
-                    </div>
-                `;
+                const thumbCombined = s.isCombined || false;
+                if (thumbCombined) {
+                    // Combined image - show single thumbnail
+                    thumbsHtml += `
+                        <div class="ekwa-bag-modal-thumb ekwa-bag-combined-thumb ${i === self.currentViewIdx ? 'active' : ''}" data-idx="${i}">
+                            <img src="${s.before}" alt="${s.beforeAlt || 'Combined Before/After'}">
+                        </div>
+                    `;
+                } else {
+                    // Separate images - show both thumbnails
+                    thumbsHtml += `
+                        <div class="ekwa-bag-modal-thumb ${i === self.currentViewIdx ? 'active' : ''}" data-idx="${i}">
+                            <img src="${s.before}" alt="${s.beforeAlt || 'Before'}">
+                            <img src="${s.after}" alt="${s.afterAlt || 'After'}">
+                        </div>
+                    `;
+                }
             });
             this.$modalThumbs.html(thumbsHtml);
 

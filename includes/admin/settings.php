@@ -27,6 +27,8 @@ if (isset($_POST['ekwa_bag_save_settings']) && check_admin_referer('ekwa_bag_set
         // Gallery Settings
         'card_design'         => sanitize_text_field($_POST['ekwa_bag_card_design'] ?? 'stacked'),
         'cards_per_row'       => absint($_POST['ekwa_bag_cards_per_row'] ?? 3),
+        'pair_as_one_image'   => isset($_POST['ekwa_bag_pair_as_one_image']) ? 1 : 0,
+        'show_before_after_labels' => isset($_POST['ekwa_bag_show_before_after_labels']) ? 1 : 0,
         
         // Watermark Settings
         'watermark_enabled'   => isset($_POST['ekwa_bag_watermark_enabled']) ? 1 : 0,
@@ -59,6 +61,8 @@ $defaults = array(
     // Gallery Defaults
     'card_design'         => 'stacked',
     'cards_per_row'       => 3,
+    'pair_as_one_image'   => 0,
+    'show_before_after_labels' => 1,
     
     // Watermark Defaults
     'watermark_enabled'   => 0,
@@ -225,6 +229,28 @@ if ($settings['watermark_enabled']) {
                     <div class="ekwa-bag-field">
                         <input type="number" name="ekwa_bag_cards_per_row" id="ekwa_bag_cards_per_row" value="<?php echo esc_attr($settings['cards_per_row']); ?>" min="1" max="6">
                         <span class="description"><?php esc_html_e('Number of cards to display per row (1-6)', 'ekwa-before-after-gallery'); ?></span>
+                    </div>
+                </div>
+
+                <div class="ekwa-bag-settings-row">
+                    <label><?php esc_html_e('Before/After Image Upload', 'ekwa-before-after-gallery'); ?></label>
+                    <div class="ekwa-bag-field">
+                        <label class="ekwa-bag-checkbox">
+                            <input type="checkbox" name="ekwa_bag_pair_as_one_image" value="1" <?php checked($settings['pair_as_one_image'], 1); ?>>
+                            <?php esc_html_e('Upload Before/After as Single Combined Image', 'ekwa-before-after-gallery'); ?>
+                        </label>
+                        <span class="description"><?php esc_html_e('When enabled, you can upload one image containing both before and after photos side-by-side, instead of uploading them separately.', 'ekwa-before-after-gallery'); ?></span>
+                    </div>
+                </div>
+
+                <div class="ekwa-bag-settings-row">
+                    <label><?php esc_html_e('Image Labels', 'ekwa-before-after-gallery'); ?></label>
+                    <div class="ekwa-bag-field">
+                        <label class="ekwa-bag-checkbox">
+                            <input type="checkbox" name="ekwa_bag_show_before_after_labels" value="1" <?php checked($settings['show_before_after_labels'], 1); ?>>
+                            <?php esc_html_e('Show Before/After Labels', 'ekwa-before-after-gallery'); ?>
+                        </label>
+                        <span class="description"><?php esc_html_e('Display "Before" and "After" labels on images in both gallery cards and modal view.', 'ekwa-before-after-gallery'); ?></span>
                     </div>
                 </div>
             </div>

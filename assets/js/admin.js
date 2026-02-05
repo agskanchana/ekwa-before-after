@@ -76,51 +76,90 @@
         }
 
         getSetTemplate(number) {
-            return `
-                <div class="ekwa-bag-image-set">
-                    <div class="ekwa-bag-image-set-header">
-                        <span class="ekwa-bag-image-set-title">
-                            <span class="dashicons dashicons-move"></span>
-                            Image Set #<span class="ekwa-bag-set-number">${number}</span>
-                        </span>
-                        <button type="button" class="ekwa-bag-remove-set">
-                            <span class="dashicons dashicons-trash"></span> Remove
-                        </button>
-                    </div>
-                    <div class="ekwa-bag-image-set-content">
-                        <div class="ekwa-bag-image-field" data-type="before">
-                            <label>Before Image</label>
-                            <div class="ekwa-bag-image-preview">
-                                <span class="ekwa-bag-no-image">No image selected</span>
-                            </div>
-                            <input type="hidden" name="ekwa_bag_image_sets[${number - 1}][before]" value="">
-                            <div class="ekwa-bag-image-buttons">
-                                <button type="button" class="ekwa-bag-select-image">Select Image</button>
-                                <button type="button" class="ekwa-bag-remove-image">Remove</button>
-                            </div>
+            // Check if we're in single-image mode
+            const isSingleImageMode = $('.ekwa-bag-image-set-content').hasClass('single-image-mode');
+            
+            if (isSingleImageMode) {
+                return `
+                    <div class="ekwa-bag-image-set">
+                        <div class="ekwa-bag-image-set-header">
+                            <span class="ekwa-bag-image-set-title">
+                                <span class="dashicons dashicons-move"></span>
+                                Image Set #<span class="ekwa-bag-set-number">${number}</span>
+                            </span>
+                            <button type="button" class="ekwa-bag-remove-set">
+                                <span class="dashicons dashicons-trash"></span> Remove
+                            </button>
                         </div>
-                        <div class="ekwa-bag-image-field" data-type="after">
-                            <label>After Image</label>
-                            <div class="ekwa-bag-image-preview">
-                                <span class="ekwa-bag-no-image">No image selected</span>
-                            </div>
-                            <input type="hidden" name="ekwa_bag_image_sets[${number - 1}][after]" value="">
-                            <div class="ekwa-bag-image-buttons">
-                                <button type="button" class="ekwa-bag-select-image">Select Image</button>
-                                <button type="button" class="ekwa-bag-remove-image">Remove</button>
+                        <div class="ekwa-bag-image-set-content single-image-mode">
+                            <div class="ekwa-bag-image-field ekwa-bag-single-image-field" data-type="single">
+                                <label>Before/After Combined Image</label>
+                                <div class="ekwa-bag-image-preview">
+                                    <span class="ekwa-bag-no-image">No image selected</span>
+                                </div>
+                                <input type="hidden" name="ekwa_bag_image_sets[${number - 1}][single_image]" value="">
+                                <div class="ekwa-bag-image-buttons">
+                                    <button type="button" class="ekwa-bag-select-image">Select Image</button>
+                                    <button type="button" class="ekwa-bag-remove-image">Remove</button>
+                                </div>
+                                <p class="description">Upload one image containing both before and after photos side-by-side.</p>
                             </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
+            } else {
+                return `
+                    <div class="ekwa-bag-image-set">
+                        <div class="ekwa-bag-image-set-header">
+                            <span class="ekwa-bag-image-set-title">
+                                <span class="dashicons dashicons-move"></span>
+                                Image Set #<span class="ekwa-bag-set-number">${number}</span>
+                            </span>
+                            <button type="button" class="ekwa-bag-remove-set">
+                                <span class="dashicons dashicons-trash"></span> Remove
+                            </button>
+                        </div>
+                        <div class="ekwa-bag-image-set-content">
+                            <div class="ekwa-bag-image-field" data-type="before">
+                                <label>Before Image</label>
+                                <div class="ekwa-bag-image-preview">
+                                    <span class="ekwa-bag-no-image">No image selected</span>
+                                </div>
+                                <input type="hidden" name="ekwa_bag_image_sets[${number - 1}][before]" value="">
+                                <div class="ekwa-bag-image-buttons">
+                                    <button type="button" class="ekwa-bag-select-image">Select Image</button>
+                                    <button type="button" class="ekwa-bag-remove-image">Remove</button>
+                                </div>
+                            </div>
+                            <div class="ekwa-bag-image-field" data-type="after">
+                                <label>After Image</label>
+                                <div class="ekwa-bag-image-preview">
+                                    <span class="ekwa-bag-no-image">No image selected</span>
+                                </div>
+                                <input type="hidden" name="ekwa_bag_image_sets[${number - 1}][after]" value="">
+                                <div class="ekwa-bag-image-buttons">
+                                    <button type="button" class="ekwa-bag-select-image">Select Image</button>
+                                    <button type="button" class="ekwa-bag-remove-image">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
         }
 
         updateSetNumbers() {
             this.$container.find('.ekwa-bag-image-set').each(function(index) {
                 const $set = $(this);
                 $set.find('.ekwa-bag-set-number').text(index + 1);
-                $set.find('input[name*="before"]').attr('name', `ekwa_bag_image_sets[${index}][before]`);
-                $set.find('input[name*="after"]').attr('name', `ekwa_bag_image_sets[${index}][after]`);
+                
+                // Handle both single-image and separate image modes
+                if ($set.find('.single-image-mode').length) {
+                    $set.find('input[name*="single_image"]').attr('name', `ekwa_bag_image_sets[${index}][single_image]`);
+                } else {
+                    $set.find('input[name*="before"]').attr('name', `ekwa_bag_image_sets[${index}][before]`);
+                    $set.find('input[name*="after"]').attr('name', `ekwa_bag_image_sets[${index}][after]`);
+                }
             });
         }
 
