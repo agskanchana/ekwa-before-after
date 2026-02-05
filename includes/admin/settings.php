@@ -25,12 +25,8 @@ if (isset($_POST['ekwa_bag_save_settings']) && check_admin_referer('ekwa_bag_set
         'color_border'      => sanitize_hex_color($_POST['ekwa_bag_color_border'] ?? '#e8e4df'),
         
         // Gallery Settings
-        'gallery_title'       => sanitize_text_field($_POST['ekwa_bag_gallery_title'] ?? ''),
-        'gallery_subtitle'    => sanitize_text_field($_POST['ekwa_bag_gallery_subtitle'] ?? ''),
-        'cards_per_page'      => absint($_POST['ekwa_bag_cards_per_page'] ?? 9),
-        'enable_lightbox'     => isset($_POST['ekwa_bag_enable_lightbox']) ? 1 : 0,
-        'enable_lazy_load'    => isset($_POST['ekwa_bag_enable_lazy_load']) ? 1 : 0,
-        'image_quality'       => absint($_POST['ekwa_bag_image_quality'] ?? 90),
+        'card_design'         => sanitize_text_field($_POST['ekwa_bag_card_design'] ?? 'stacked'),
+        'cards_per_row'       => absint($_POST['ekwa_bag_cards_per_row'] ?? 3),
         
         // Watermark Settings
         'watermark_enabled'   => isset($_POST['ekwa_bag_watermark_enabled']) ? 1 : 0,
@@ -61,12 +57,8 @@ $defaults = array(
     'color_border'      => '#e8e4df',
     
     // Gallery Defaults
-    'gallery_title'       => '',
-    'gallery_subtitle'    => '',
-    'cards_per_page'      => 9,
-    'enable_lightbox'     => 1,
-    'enable_lazy_load'    => 1,
-    'image_quality'       => 90,
+    'card_design'         => 'stacked',
+    'cards_per_row'       => 3,
     
     // Watermark Defaults
     'watermark_enabled'   => 0,
@@ -216,48 +208,23 @@ if ($settings['watermark_enabled']) {
                 <h2><?php esc_html_e('Gallery Settings', 'ekwa-before-after-gallery'); ?></h2>
 
                 <div class="ekwa-bag-settings-row">
-                    <label for="ekwa_bag_gallery_title"><?php esc_html_e('Default Title', 'ekwa-before-after-gallery'); ?></label>
+                    <label for="ekwa_bag_card_design"><?php esc_html_e('Card Design', 'ekwa-before-after-gallery'); ?></label>
                     <div class="ekwa-bag-field">
-                        <input type="text" name="ekwa_bag_gallery_title" id="ekwa_bag_gallery_title" value="<?php echo esc_attr($settings['gallery_title']); ?>" placeholder="<?php esc_attr_e('Before & After Gallery', 'ekwa-before-after-gallery'); ?>">
-                        <span class="description"><?php esc_html_e('Default gallery title (can be overridden via shortcode)', 'ekwa-before-after-gallery'); ?></span>
+                        <select name="ekwa_bag_card_design" id="ekwa_bag_card_design" class="ekwa-bag-select">
+                            <option value="stacked" <?php selected($settings['card_design'], 'stacked'); ?>><?php esc_html_e('Stacked - Before/After vertically stacked', 'ekwa-before-after-gallery'); ?></option>
+                            <option value="side-by-side" <?php selected($settings['card_design'], 'side-by-side'); ?>><?php esc_html_e('Side by Side - Before/After horizontally', 'ekwa-before-after-gallery'); ?></option>
+                            <option value="overlay" <?php selected($settings['card_design'], 'overlay'); ?>><?php esc_html_e('Overlay - Hover to reveal after', 'ekwa-before-after-gallery'); ?></option>
+                            <option value="minimal" <?php selected($settings['card_design'], 'minimal'); ?>><?php esc_html_e('Minimal - Clean single image card', 'ekwa-before-after-gallery'); ?></option>
+                        </select>
+                        <span class="description"><?php esc_html_e('Choose how cards are displayed in the gallery grid', 'ekwa-before-after-gallery'); ?></span>
                     </div>
                 </div>
 
                 <div class="ekwa-bag-settings-row">
-                    <label for="ekwa_bag_gallery_subtitle"><?php esc_html_e('Default Subtitle', 'ekwa-before-after-gallery'); ?></label>
+                    <label for="ekwa_bag_cards_per_row"><?php esc_html_e('Cards Per Row', 'ekwa-before-after-gallery'); ?></label>
                     <div class="ekwa-bag-field">
-                        <input type="text" name="ekwa_bag_gallery_subtitle" id="ekwa_bag_gallery_subtitle" value="<?php echo esc_attr($settings['gallery_subtitle']); ?>" placeholder="<?php esc_attr_e('See the transformation our patients have experienced', 'ekwa-before-after-gallery'); ?>">
-                        <span class="description"><?php esc_html_e('Default gallery subtitle', 'ekwa-before-after-gallery'); ?></span>
-                    </div>
-                </div>
-
-                <div class="ekwa-bag-settings-row">
-                    <label for="ekwa_bag_cards_per_page"><?php esc_html_e('Cards Per Page', 'ekwa-before-after-gallery'); ?></label>
-                    <div class="ekwa-bag-field">
-                        <input type="number" name="ekwa_bag_cards_per_page" id="ekwa_bag_cards_per_page" value="<?php echo esc_attr($settings['cards_per_page']); ?>" min="1" max="50">
-                        <span class="description"><?php esc_html_e('Number of cases to display per page (use -1 for all)', 'ekwa-before-after-gallery'); ?></span>
-                    </div>
-                </div>
-
-                <div class="ekwa-bag-settings-row">
-                    <label for="ekwa_bag_image_quality"><?php esc_html_e('Image Quality', 'ekwa-before-after-gallery'); ?></label>
-                    <div class="ekwa-bag-field">
-                        <input type="number" name="ekwa_bag_image_quality" id="ekwa_bag_image_quality" value="<?php echo esc_attr($settings['image_quality']); ?>" min="10" max="100">
-                        <span class="description"><?php esc_html_e('JPEG quality for processed images (10-100)', 'ekwa-before-after-gallery'); ?></span>
-                    </div>
-                </div>
-
-                <div class="ekwa-bag-settings-row">
-                    <label><?php esc_html_e('Features', 'ekwa-before-after-gallery'); ?></label>
-                    <div class="ekwa-bag-field">
-                        <label class="ekwa-bag-checkbox">
-                            <input type="checkbox" name="ekwa_bag_enable_lightbox" value="1" <?php checked($settings['enable_lightbox'], 1); ?>>
-                            <?php esc_html_e('Enable Lightbox', 'ekwa-before-after-gallery'); ?>
-                        </label>
-                        <label class="ekwa-bag-checkbox">
-                            <input type="checkbox" name="ekwa_bag_enable_lazy_load" value="1" <?php checked($settings['enable_lazy_load'], 1); ?>>
-                            <?php esc_html_e('Enable Lazy Loading', 'ekwa-before-after-gallery'); ?>
-                        </label>
+                        <input type="number" name="ekwa_bag_cards_per_row" id="ekwa_bag_cards_per_row" value="<?php echo esc_attr($settings['cards_per_row']); ?>" min="1" max="6">
+                        <span class="description"><?php esc_html_e('Number of cards to display per row (1-6)', 'ekwa-before-after-gallery'); ?></span>
                     </div>
                 </div>
             </div>

@@ -179,7 +179,7 @@
 /* Card Grid */
 .ekwa-bag-card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: 30px;
     padding: 0 40px 60px;
     max-width: 1400px;
@@ -215,8 +215,8 @@
 .ekwa-bag-card-img-wrapper img {
     width: 100%;
     height: auto;
-    min-height: 180px;
-    object-fit: contain;
+    /* min-height: 180px; */
+    /* object-fit: contain; */
     display: block;
     transition: transform 0.5s ease;
     background: #f9f9f9;
@@ -622,13 +622,19 @@
 }
 
 /* Responsive */
+@media (max-width: 1200px) {
+    .ekwa-bag-card-grid {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)) !important;
+    }
+}
+
 @media (max-width: 900px) {
     .ekwa-bag-modal-images {
         grid-template-columns: 1fr;
     }
-
-    .ekwa-bag-modal-img-box img {
-        height: 220px;
+    
+    .ekwa-bag-card-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
     }
 }
 
@@ -641,10 +647,7 @@
     .ekwa-bag-card-grid {
         padding: 0 20px 40px;
         gap: 20px;
-    }
-
-    .ekwa-bag-card-img-wrapper img {
-        height: 150px;
+        grid-template-columns: 1fr !important;
     }
 
     .ekwa-bag-modal {
@@ -658,7 +661,10 @@
 }
 
 /* Animations */
-.ekwa-bag-stacked-card {
+.ekwa-bag-stacked-card,
+.ekwa-bag-sidebyside-card,
+.ekwa-bag-overlay-card,
+.ekwa-bag-minimal-card {
     animation: ekwa-bag-cardSlideUp 0.5s ease forwards;
     opacity: 0;
 }
@@ -671,5 +677,384 @@
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+/* =============================================
+   CARD DESIGN: SIDE BY SIDE
+   ============================================= */
+.ekwa-bag-sidebyside-card {
+    background: var(--ekwa-card-bg);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--ekwa-shadow);
+    cursor: pointer;
+    transition: all 0.4s ease;
+}
+
+.ekwa-bag-sidebyside-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--ekwa-shadow-hover);
+}
+
+.ekwa-bag-sidebyside-card .ekwa-bag-card-images {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+}
+
+.ekwa-bag-sidebyside-card .ekwa-bag-card-img-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.ekwa-bag-sidebyside-card .ekwa-bag-card-img-wrapper:first-child {
+    border-right: 2px solid var(--ekwa-accent);
+}
+
+.ekwa-bag-sidebyside-card .ekwa-bag-card-img-wrapper img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.5s ease;
+    background: #f9f9f9;
+}
+
+.ekwa-bag-sidebyside-card:hover .ekwa-bag-card-img-wrapper img {
+    transform: scale(1.05);
+}
+
+.ekwa-bag-sidebyside-card .ekwa-bag-card-img-label {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    padding: 4px 10px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 4px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--ekwa-text);
+    top: auto;
+}
+
+.ekwa-bag-sidebyside-card .ekwa-bag-card-img-wrapper.after .ekwa-bag-card-img-label {
+    background: var(--ekwa-accent);
+    color: #fff;
+}
+
+.ekwa-bag-sidebyside-card .ekwa-bag-card-separator {
+    display: none;
+}
+
+.ekwa-bag-sidebyside-card .ekwa-bag-card-content {
+    padding: 18px;
+}
+
+.ekwa-bag-sidebyside-card .ekwa-bag-card-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+    line-height: 1.4;
+    color: var(--ekwa-text);
+}
+
+.ekwa-bag-sidebyside-card .ekwa-bag-card-desc {
+    font-size: 0.8rem;
+    color: var(--ekwa-text-soft);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.ekwa-bag-sidebyside-card .ekwa-bag-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--ekwa-border);
+}
+
+/* =============================================
+   CARD DESIGN: OVERLAY (Hover to reveal)
+   ============================================= */
+.ekwa-bag-overlay-card {
+    background: var(--ekwa-card-bg);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--ekwa-shadow);
+    cursor: pointer;
+    transition: all 0.4s ease;
+}
+
+.ekwa-bag-overlay-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--ekwa-shadow-hover);
+}
+
+.ekwa-bag-overlay-card .ekwa-bag-card-images {
+    position: relative;
+    overflow: hidden;
+    display: grid;
+}
+
+.ekwa-bag-overlay-card .ekwa-bag-card-img-wrapper {
+    grid-area: 1 / 1;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.ekwa-bag-overlay-card .ekwa-bag-card-img-wrapper img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.ekwa-bag-overlay-card .ekwa-bag-card-img-wrapper.after {
+    opacity: 0;
+}
+
+.ekwa-bag-overlay-card:hover .ekwa-bag-card-img-wrapper:not(.after) {
+    opacity: 0;
+    transform: scale(1.1);
+}
+
+.ekwa-bag-overlay-card:hover .ekwa-bag-card-img-wrapper.after {
+    opacity: 1;
+}
+
+.ekwa-bag-overlay-card .ekwa-bag-card-img-label {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--ekwa-text);
+    transition: opacity 0.3s ease;
+    z-index: 2;
+}
+
+.ekwa-bag-overlay-card .ekwa-bag-card-img-wrapper.after .ekwa-bag-card-img-label {
+    background: var(--ekwa-accent);
+    color: #fff;
+}
+
+.ekwa-bag-overlay-card:hover .ekwa-bag-card-img-wrapper:not(.after) .ekwa-bag-card-img-label {
+    opacity: 0;
+}
+
+.ekwa-bag-overlay-card .ekwa-bag-card-separator {
+    display: none;
+}
+
+/* Overlay hint */
+.ekwa-bag-overlay-card .ekwa-bag-card-images::after {
+    content: 'Hover to see after';
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    padding: 6px 12px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+    z-index: 2;
+}
+
+.ekwa-bag-overlay-card:hover .ekwa-bag-card-images::after {
+    opacity: 0;
+}
+
+.ekwa-bag-overlay-card .ekwa-bag-card-content {
+    padding: 20px;
+}
+
+.ekwa-bag-overlay-card .ekwa-bag-card-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.15rem;
+    margin-bottom: 8px;
+    line-height: 1.4;
+    color: var(--ekwa-text);
+}
+
+.ekwa-bag-overlay-card .ekwa-bag-card-desc {
+    font-size: 0.85rem;
+    color: var(--ekwa-text-soft);
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.ekwa-bag-overlay-card .ekwa-bag-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid var(--ekwa-border);
+}
+
+/* =============================================
+   CARD DESIGN: MINIMAL (Clean single image)
+   ============================================= */
+.ekwa-bag-minimal-card {
+    background: var(--ekwa-card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    cursor: pointer;
+    transition: all 0.4s ease;
+    border: 1px solid var(--ekwa-border);
+}
+
+.ekwa-bag-minimal-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+    border-color: var(--ekwa-accent);
+}
+
+.ekwa-bag-minimal-card .ekwa-bag-card-images {
+    position: relative;
+    overflow: hidden;
+}
+
+.ekwa-bag-minimal-card .ekwa-bag-card-img-wrapper:not(:first-child) {
+    display: none;
+}
+
+.ekwa-bag-minimal-card .ekwa-bag-card-img-wrapper img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.5s ease;
+    filter: grayscale(10%);
+}
+
+.ekwa-bag-minimal-card:hover .ekwa-bag-card-img-wrapper img {
+    transform: scale(1.03);
+    filter: grayscale(0%);
+}
+
+.ekwa-bag-minimal-card .ekwa-bag-card-img-label {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 5px 12px;
+    background: var(--ekwa-accent);
+    border-radius: 20px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #fff;
+}
+
+.ekwa-bag-minimal-card .ekwa-bag-card-separator {
+    display: none;
+}
+
+/* Before/After indicator badge */
+.ekwa-bag-minimal-card .ekwa-bag-card-images::after {
+    content: 'B / A';
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    padding: 6px 12px;
+    background: rgba(255,255,255,0.95);
+    color: var(--ekwa-text);
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.ekwa-bag-minimal-card .ekwa-bag-card-content {
+    padding: 20px;
+}
+
+.ekwa-bag-minimal-card .ekwa-bag-card-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    line-height: 1.4;
+    color: var(--ekwa-text);
+}
+
+.ekwa-bag-minimal-card .ekwa-bag-card-desc {
+    font-size: 0.85rem;
+    color: var(--ekwa-text-soft);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.ekwa-bag-minimal-card .ekwa-bag-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--ekwa-border);
+}
+
+.ekwa-bag-minimal-card .ekwa-bag-card-views {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--ekwa-text-soft);
+}
+
+.ekwa-bag-minimal-card .ekwa-bag-card-views i {
+    color: var(--ekwa-accent);
+}
+
+.ekwa-bag-minimal-card .ekwa-bag-card-action {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--ekwa-accent-dark);
+    transition: all 0.3s ease;
+}
+
+.ekwa-bag-minimal-card:hover .ekwa-bag-card-action {
+    gap: 10px;
+}
+
+/* =============================================
+   RESPONSIVE: Card Designs
+   ============================================= */
+@media (max-width: 600px) {
+    /* Side by Side becomes stacked on mobile */
+    .ekwa-bag-sidebyside-card .ekwa-bag-card-images {
+        grid-template-columns: 1fr;
+    }
+    
+    .ekwa-bag-sidebyside-card .ekwa-bag-card-img-wrapper:first-child {
+        border-right: none;
+        border-bottom: 2px solid var(--ekwa-accent);
+    }
+    
+    /* Overlay card adjustments */
+    .ekwa-bag-overlay-card .ekwa-bag-card-images::after {
+        content: 'Tap to see after';
     }
 }

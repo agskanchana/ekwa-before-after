@@ -17,6 +17,7 @@
             this.currentCase = null;
             this.currentCaseIdx = 0;
             this.currentViewIdx = 0;
+            this.cardDesign = 'stacked'; // Default design
 
             this.init();
         }
@@ -26,10 +27,12 @@
             if (typeof ekwaBagFrontend !== 'undefined') {
                 this.cases = ekwaBagFrontend.cases || [];
                 this.categoryTree = ekwaBagFrontend.categories || {};
+                this.cardDesign = ekwaBagFrontend.cardDesign || 'stacked';
                 this.filtered = [...this.cases];
                 
                 // Debug logging
                 console.log('EKWA Gallery initialized with', this.cases.length, 'cases');
+                console.log('Card design:', this.cardDesign);
                 console.log('Cases data:', this.cases);
                 console.log('Categories:', this.categoryTree);
                 
@@ -204,6 +207,15 @@
         renderGrid() {
             const self = this;
 
+            // Get card class based on design setting
+            const cardClassMap = {
+                'stacked': 'ekwa-bag-stacked-card',
+                'side-by-side': 'ekwa-bag-sidebyside-card',
+                'overlay': 'ekwa-bag-overlay-card',
+                'minimal': 'ekwa-bag-minimal-card'
+            };
+            const cardClass = cardClassMap[this.cardDesign] || 'ekwa-bag-stacked-card';
+
             if (this.cases.length === 0) {
                 // No cases at all - show "add from admin" message
                 this.$cardGrid.html(`
@@ -240,7 +252,7 @@
                 const afterAttrs = `src="${set.after}" alt="${set.afterAlt || 'After'}"${set.afterWidth ? ` width="${set.afterWidth}"` : ''}${set.afterHeight ? ` height="${set.afterHeight}"` : ''}`;
                 
                 html += `
-                    <article class="ekwa-bag-stacked-card" data-id="${c.id}" style="animation-delay: ${idx * 0.08}s">
+                    <article class="${cardClass}" data-id="${c.id}" style="animation-delay: ${idx * 0.08}s">
                         <div class="ekwa-bag-card-images">
                             <div class="ekwa-bag-card-img-wrapper">
                                 <img ${beforeAttrs}>
@@ -272,7 +284,7 @@
             this.$cardGrid.html(html);
 
             // Bind click events
-            this.$cardGrid.find('.ekwa-bag-stacked-card').on('click', function() {
+            this.$cardGrid.find('.' + cardClass).on('click', function() {
                 const id = parseInt($(this).data('id'));
                 self.openModal(id);
             });

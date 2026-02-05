@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('EKWA_BAG_VERSION', '1.2.9');
+define('EKWA_BAG_VERSION', '1.3.0');
 define('EKWA_BAG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('EKWA_BAG_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -342,12 +342,17 @@ class EKWA_Before_After_Gallery {
         wp_enqueue_style('ekwa-bag-gallery', EKWA_BAG_PLUGIN_URL . 'assets/css/gallery.css', array(), EKWA_BAG_VERSION);
         wp_enqueue_script('ekwa-bag-gallery', EKWA_BAG_PLUGIN_URL . 'assets/js/gallery.js', array('jquery'), EKWA_BAG_VERSION, true);
         
+        // Get settings for card design
+        $settings = get_option('ekwa_bag_settings', array());
+        $card_design = isset($settings['card_design']) ? $settings['card_design'] : 'stacked';
+        
         // Use inline script to pass data reliably
         $json_data = json_encode(array(
             'ajaxUrl'    => admin_url('admin-ajax.php'),
             'nonce'      => wp_create_nonce('ekwa_bag_frontend_nonce'),
             'cases'      => $cases,
             'categories' => $categories,
+            'cardDesign' => $card_design,
             'debug'      => $this->get_debug_info(),
         ));
         
@@ -734,6 +739,7 @@ class EKWA_Before_After_Gallery {
             'color_accent'      => '#c9a87c',
             'color_accent_dark' => '#b08d5b',
             'color_border'      => '#e8e4df',
+            'cards_per_row'     => 3,
         );
         $settings = wp_parse_args($settings, $defaults);
         
@@ -747,6 +753,9 @@ class EKWA_Before_After_Gallery {
                 --ekwa-accent: <?php echo esc_attr($settings['color_accent']); ?>;
                 --ekwa-accent-dark: <?php echo esc_attr($settings['color_accent_dark']); ?>;
                 --ekwa-border: <?php echo esc_attr($settings['color_border']); ?>;
+            }
+            .ekwa-bag-card-grid {
+                grid-template-columns: repeat(<?php echo absint($settings['cards_per_row']); ?>, 1fr);
             }
         </style>
         <?php

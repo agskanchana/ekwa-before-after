@@ -913,6 +913,11 @@
     border-radius: 4px;
 }
 
+/* Select Dropdown */
+.ekwa-bag-select {
+    min-width: 300px;
+}
+
 /* Responsive */
 @media (max-width: 782px) {
     .ekwa-bag-image-set-content {

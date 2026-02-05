@@ -194,6 +194,22 @@
             this.initRangeSliders();
             this.initBulkTools();
             this.initImportExport();
+            this.initCardDesignSelector();
+        }
+
+        // Card Design Selector
+        initCardDesignSelector() {
+            const $selector = $('.ekwa-bag-card-design-selector');
+            if (!$selector.length) return;
+
+            // Handle radio button change
+            $selector.find('input[type="radio"]').on('change', function() {
+                $selector.find('.ekwa-bag-design-option').removeClass('selected');
+                $(this).closest('.ekwa-bag-design-option').addClass('selected');
+            });
+
+            // Initial state - mark selected option
+            $selector.find('input[type="radio"]:checked').closest('.ekwa-bag-design-option').addClass('selected');
         }
 
         // Tab Navigation
