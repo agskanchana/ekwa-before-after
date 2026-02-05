@@ -214,10 +214,12 @@
 
 .ekwa-bag-card-img-wrapper img {
     width: 100%;
-    height: 180px;
-    object-fit: cover;
+    height: auto;
+    min-height: 180px;
+    object-fit: contain;
     display: block;
     transition: transform 0.5s ease;
+    background: #f9f9f9;
 }
 
 .ekwa-bag-stacked-card:hover .ekwa-bag-card-img-wrapper img {
@@ -423,9 +425,8 @@
 
 .ekwa-bag-modal-img-box img {
     width: 100%;
-    height: 280px;
-    object-fit: cover;
     display: block;
+    height: auto;
 }
 
 .ekwa-bag-modal-img-tag {
