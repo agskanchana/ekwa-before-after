@@ -16,6 +16,16 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+
+require 'includes/plugin-update-checker/plugin-update-checker.php';
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+
+$myUpdateChecker = PucFactory::buildUpdateChecker(
+	'https://github.com/agskanchana-sam/ekwa-before-after/',
+	__FILE__,
+	'ekwa-before-after-gallery'
+);
+
 // Define plugin constants
 define('EKWA_BAG_VERSION', '1.3.0');
 define('EKWA_BAG_PLUGIN_DIR', plugin_dir_path(__FILE__));
