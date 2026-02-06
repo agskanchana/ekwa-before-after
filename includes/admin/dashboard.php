@@ -63,12 +63,7 @@ foreach ($cases as $case) {
                 <code>[ekwa_gallery]</code>
                 <button type="button" class="ekwa-bag-copy-btn"><?php esc_html_e('Copy', 'ekwa-before-after-gallery'); ?></button>
             </div>
-            <div style="margin-top: 15px; padding: 15px; background: #f9f9f9; border-radius: 8px;">
-                <strong style="display: block; margin-bottom: 10px;"><?php esc_html_e('Shortcode Parameters:', 'ekwa-before-after-gallery'); ?></strong>
-                <code style="display: block; margin-bottom: 8px; font-size: 13px;">[ekwa_gallery title="My Gallery" subtitle="Browse our work"]</code>
-                <code style="display: block; margin-bottom: 8px; font-size: 13px;">[ekwa_gallery category="cosmetic" limit="6"]</code>
-                <code style="display: block; font-size: 13px;">[ekwa_gallery show_filter="no"]</code>
-            </div>
+            
         </div>
     </div>
 
