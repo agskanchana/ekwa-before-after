@@ -26,6 +26,9 @@ $myUpdateChecker = PucFactory::buildUpdateChecker(
 	'ekwa-before-after-gallery'
 );
 
+// Set branch for updates (important for private repos)
+$myUpdateChecker->setBranch('main');
+
 // Define plugin constants
 define('EKWA_BAG_VERSION', '1.3.0');
 define('EKWA_BAG_PLUGIN_DIR', plugin_dir_path(__FILE__));
