@@ -315,7 +315,16 @@ class EKWA_Before_After_Gallery {
             wp_enqueue_style('ekwa-bag-fonts', 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap', array(), null);
             wp_enqueue_style('ekwa-bag-fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', array(), '6.4.0');
             wp_enqueue_style('ekwa-bag-gallery', EKWA_BAG_PLUGIN_URL . 'assets/css/gallery.css', array(), EKWA_BAG_VERSION);
-            wp_enqueue_script('ekwa-bag-gallery', EKWA_BAG_PLUGIN_URL . 'assets/js/gallery.js', array('jquery', 'jqueryjs-js'), EKWA_BAG_VERSION, true);
+            
+            // Check which jQuery handle is registered
+            $jquery_deps = array();
+            if (wp_script_is('jqueryjs-js', 'registered')) {
+                $jquery_deps[] = 'jqueryjs-js';
+            } elseif (wp_script_is('jquery', 'registered')) {
+                $jquery_deps[] = 'jquery';
+            }
+            
+            wp_enqueue_script('ekwa-bag-gallery', EKWA_BAG_PLUGIN_URL . 'assets/js/gallery.js', $jquery_deps, EKWA_BAG_VERSION, true);
             
             wp_localize_script('ekwa-bag-gallery', 'ekwaBagFrontend', array(
                 'ajaxUrl' => admin_url('admin-ajax.php'),
@@ -350,7 +359,16 @@ class EKWA_Before_After_Gallery {
         wp_enqueue_style('ekwa-bag-fonts', 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap', array(), null);
         wp_enqueue_style('ekwa-bag-fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', array(), '6.4.0');
         wp_enqueue_style('ekwa-bag-gallery', EKWA_BAG_PLUGIN_URL . 'assets/css/gallery.css', array(), EKWA_BAG_VERSION);
-        wp_enqueue_script('ekwa-bag-gallery', EKWA_BAG_PLUGIN_URL . 'assets/js/gallery.js', array('jquery', 'jqueryjs-js'), EKWA_BAG_VERSION, true);
+        
+        // Check which jQuery handle is registered
+        $jquery_deps = array();
+        if (wp_script_is('jqueryjs-js', 'registered')) {
+            $jquery_deps[] = 'jqueryjs-js';
+        } elseif (wp_script_is('jquery', 'registered')) {
+            $jquery_deps[] = 'jquery';
+        }
+        
+        wp_enqueue_script('ekwa-bag-gallery', EKWA_BAG_PLUGIN_URL . 'assets/js/gallery.js', $jquery_deps, EKWA_BAG_VERSION, true);
         
         // Get settings for card design
         $settings = get_option('ekwa_bag_settings', array());
