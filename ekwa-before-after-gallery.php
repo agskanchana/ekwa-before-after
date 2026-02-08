@@ -32,7 +32,7 @@ $myUpdateChecker->setBranch('main');
 
 
 // Define plugin constants
-define('EKWA_BAG_VERSION', '1.3.0');
+define('EKWA_BAG_VERSION', '1.3.4');
 define('EKWA_BAG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('EKWA_BAG_PLUGIN_URL', plugin_dir_url(__FILE__));
 
