@@ -16,6 +16,9 @@ A beautiful, modern, and highly customizable before-and-after gallery plugin for
 - **SEO Friendly**: Optimized markup for better search engine visibility.
 - **Translation Ready**: Includes .pot file for easy translation.
 - **Lightweight & Fast**: Minimal impact on site performance.
+- **Watermarking & Removal**: Add or remove watermarks on images for branding or privacy.
+- **Flexible Image Upload**: Add before and after images as a single combined image or separately.
+- **Gallery Settings**: Customize card design and set cards per row for layout flexibility.
 
 ## Shortcode Usage
 
@@ -46,6 +49,20 @@ With parameters:
 3. Go to 'BA Gallery' in the admin menu to add cases
 4. Add the shortcode `[ekwa_gallery]` to any page or post
 
+## Gallery Settings
+
+- Card Design: Choose from multiple card styles
+- Cards Per Row: Set the number of cards displayed per row
+
+## Watermarking
+
+- Add watermarks to images for branding or privacy
+- Remove watermarks as needed from the admin interface
+
+## Flexible Image Upload
+
+- Upload before and after images as a single combined image or separately
+
 ## Screenshots
 
 1. Frontend gallery view with stacked cards
@@ -56,6 +73,10 @@ With parameters:
 ## License
 
 GPLv2 or later
+
+## Issues & Suggestions
+
+Submit issues or suggestions here: [GitHub Issues](https://github.com/agskanchana/ekwa-before-after/issues)
 
 ---
 

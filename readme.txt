@@ -17,6 +17,9 @@ EKWA Before After Gallery is a powerful and elegant plugin for showcasing transf
 = Features =
 
 * **Beautiful Stacked Card Design** - Modern and elegant card layout with vertically stacked before/after images
+* **Watermarking & Removal** - Add or remove watermarks on images for branding or privacy
+* **Flexible Image Upload** - Add before and after images as a single combined image or separately
+* **Gallery Settings** - Customize card design and set cards per row for layout flexibility
 * **Multi-Level Filtering** - Filter by main categories and sub-categories
 * **Multiple Image Sets** - Add multiple before/after angles for each case
 * **Responsive Design** - Looks great on all devices
@@ -37,13 +40,21 @@ With parameters:
 
 * `title` - Gallery title (default: "Smile Transformations")
 * `subtitle` - Gallery subtitle
+
 * `category` - Filter by category slug
+
 * `limit` - Maximum number of cases to show (-1 for all)
+
 * `show_filter` - Show/hide category filters ("yes" or "no")
+
+
 
 == Installation ==
 
+
+
 1. Upload the plugin folder to `/wp-content/plugins/`
+
 2. Activate the plugin through the 'Plugins' menu in WordPress
 3. Go to 'BA Gallery' in the admin menu to add cases
 4. Add the shortcode `[ekwa_gallery]` to any page or post
