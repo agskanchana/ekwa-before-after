@@ -28,19 +28,6 @@ Basic usage:
 [ekwa_gallery]
 ```
 
-With parameters:
-
-```
-[ekwa_gallery title="Our Results" subtitle="See the difference" category="cosmetic" limit="6" show_filter="yes"]
-```
-
-### Parameters
-
-- `title` - Gallery title (default: "Smile Transformations")
-- `subtitle` - Gallery subtitle
-- `category` - Filter by category slug
-- `limit` - Maximum number of cases to show (-1 for all)
-- `show_filter` - Show/hide category filters ("yes" or "no")
 
 ## Installation
 
