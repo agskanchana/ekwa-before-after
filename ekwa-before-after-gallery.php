@@ -3,7 +3,7 @@
  * Plugin Name: EKWA Before After Gallery
  * Plugin URI: https://ekwa.com
  * Description: A beautiful before and after gallery with stacked card design for dental and medical practices.
- * Version: 1.1.1
+ * Version: 1.1.2
  * Author: EKWA
  * Author URI: https://ekwa.com
  * License: GPL v2 or later
@@ -21,7 +21,7 @@ require 'includes/plugin-update-checker/plugin-update-checker.php';
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 $myUpdateChecker = PucFactory::buildUpdateChecker(
-	'https://github.com/agskanchana-sam/ekwa-before-after/',
+	'https://github.com/agskanchana/ekwa-before-after/',
 	__FILE__,
 	'ekwa-before-after-gallery'
 );
