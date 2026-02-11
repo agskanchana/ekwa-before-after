@@ -203,15 +203,85 @@
         init() {
             $(document).on('click', '.ekwa-bag-copy-btn', function() {
                 const $btn = $(this);
-                const text = $btn.prev('code').text();
-                
-                navigator.clipboard.writeText(text).then(function() {
+                const $code = $btn.closest('.ekwa-bag-shortcode-box').find('code');
+                const text = $code.text();
+
+                if (!text) return;
+
+                // Try modern clipboard API first, fall back to execCommand
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(text).then(function() {
+                        $btn.text('Copied!').addClass('copied');
+                        setTimeout(function() { $btn.text('Copy').removeClass('copied'); }, 2000);
+                    }).catch(function() {
+                        fallbackCopy(text, $btn);
+                    });
+                } else {
+                    fallbackCopy(text, $btn);
+                }
+            });
+
+            function fallbackCopy(text, $btn) {
+                var ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.left = '-9999px';
+                document.body.appendChild(ta);
+                ta.select();
+                try {
+                    document.execCommand('copy');
                     $btn.text('Copied!').addClass('copied');
-                    setTimeout(function() {
-                        $btn.text('Copy').removeClass('copied');
-                    }, 2000);
+                    setTimeout(function() { $btn.text('Copy').removeClass('copied'); }, 2000);
+                } catch (e) {
+                    $btn.text('Failed').addClass('copied');
+                    setTimeout(function() { $btn.text('Copy').removeClass('copied'); }, 2000);
+                }
+                document.body.removeChild(ta);
+            }
+        }
+    }
+
+    // Carousel Shortcode Builder
+    class EKWAShortcodeBuilder {
+        constructor() {
+            this.$output = $('#ekwa-sc-output');
+            if (!this.$output.length) return;
+
+            this.fields = [
+                { id: '#ekwa-sc-category',       attr: 'category' },
+                { id: '#ekwa-sc-perpage',         attr: 'per_page' },
+                { id: '#ekwa-sc-perpage-tablet',  attr: 'per_page_tablet' },
+                { id: '#ekwa-sc-perpage-mobile',  attr: 'per_page_mobile' },
+                { id: '#ekwa-sc-arrows',          attr: 'arrows' },
+                { id: '#ekwa-sc-dots',            attr: 'dots' },
+                { id: '#ekwa-sc-autoplay',        attr: 'autoplay' },
+                { id: '#ekwa-sc-limit',           attr: 'limit' }
+            ];
+
+            this.init();
+        }
+
+        init() {
+            const self = this;
+            this.fields.forEach(function(f) {
+                $(f.id).on('change', function() {
+                    self.buildShortcode();
                 });
             });
+        }
+
+        buildShortcode() {
+            let sc = '[ekwa_category_carousel';
+
+            this.fields.forEach(function(f) {
+                const val = $(f.id).val();
+                if (val) {
+                    sc += ' ' + f.attr + '="' + val + '"';
+                }
+            });
+
+            sc += ']';
+            this.$output.text(sc);
         }
     }
 
@@ -649,6 +719,7 @@
     $(document).ready(function() {
         new EKWAImageSetsManager();
         new EKWACopyShortcode();
+        new EKWAShortcodeBuilder();
         new EKWASettings();
     });
 
