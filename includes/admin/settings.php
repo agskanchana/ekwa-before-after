@@ -40,6 +40,19 @@ if (isset($_POST['ekwa_bag_save_settings']) && check_admin_referer('ekwa_bag_set
         'watermark_size'      => absint($_POST['ekwa_bag_watermark_size'] ?? 20),
         'watermark_color'     => sanitize_hex_color($_POST['ekwa_bag_watermark_color'] ?? '#ffffff'),
         'watermark_padding'   => absint($_POST['ekwa_bag_watermark_padding'] ?? 10),
+        
+        // Carousel Settings
+        'carousel' => array(
+            'per_page_desktop' => absint($_POST['ekwa_bag_carousel_per_page_desktop'] ?? 3),
+            'per_page_tablet'  => absint($_POST['ekwa_bag_carousel_per_page_tablet'] ?? 2),
+            'per_page_mobile'  => absint($_POST['ekwa_bag_carousel_per_page_mobile'] ?? 1),
+            'show_arrows'      => isset($_POST['ekwa_bag_carousel_show_arrows']) ? 1 : 0,
+            'show_dots'        => isset($_POST['ekwa_bag_carousel_show_dots']) ? 1 : 0,
+            'autoplay'         => isset($_POST['ekwa_bag_carousel_autoplay']) ? 1 : 0,
+            'autoplay_speed'   => absint($_POST['ekwa_bag_carousel_autoplay_speed'] ?? 5000),
+            'show_title'       => isset($_POST['ekwa_bag_carousel_show_title']) ? 1 : 0,
+            'title_text'       => sanitize_text_field($_POST['ekwa_bag_carousel_title_text'] ?? 'Before & After Results'),
+        ),
     );
     
     update_option('ekwa_bag_settings', $settings);
@@ -74,6 +87,19 @@ $defaults = array(
     'watermark_size'      => 20,
     'watermark_color'     => '#ffffff',
     'watermark_padding'   => 10,
+    
+    // Carousel Defaults
+    'carousel' => array(
+        'per_page_desktop' => 3,
+        'per_page_tablet'  => 2,
+        'per_page_mobile'  => 1,
+        'show_arrows'      => 1,
+        'show_dots'        => 1,
+        'autoplay'         => 0,
+        'autoplay_speed'   => 5000,
+        'show_title'       => 1,
+        'title_text'       => 'Before & After Results',
+    ),
 );
 $settings = wp_parse_args($settings, $defaults);
 
@@ -120,6 +146,7 @@ if ($settings['watermark_enabled']) {
     <nav class="nav-tab-wrapper ekwa-bag-tabs">
         <a href="#colors" class="nav-tab nav-tab-active" data-tab="colors"><?php esc_html_e('Colors', 'ekwa-before-after-gallery'); ?></a>
         <a href="#gallery" class="nav-tab" data-tab="gallery"><?php esc_html_e('Gallery', 'ekwa-before-after-gallery'); ?></a>
+        <a href="#carousel" class="nav-tab" data-tab="carousel"><?php esc_html_e('Carousel', 'ekwa-before-after-gallery'); ?></a>
         <a href="#watermark" class="nav-tab" data-tab="watermark"><?php esc_html_e('Watermark', 'ekwa-before-after-gallery'); ?></a>
         <a href="#tools" class="nav-tab" data-tab="tools"><?php esc_html_e('Tools', 'ekwa-before-after-gallery'); ?></a>
     </nav>
@@ -251,6 +278,109 @@ if ($settings['watermark_enabled']) {
                             <?php esc_html_e('Show Before/After Labels', 'ekwa-before-after-gallery'); ?>
                         </label>
                         <span class="description"><?php esc_html_e('Display "Before" and "After" labels on images in both gallery cards and modal view.', 'ekwa-before-after-gallery'); ?></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Carousel Tab -->
+        <div class="ekwa-bag-tab-content" data-tab="carousel">
+            <div class="ekwa-bag-settings-section">
+                <h2><?php esc_html_e('Category Carousel Settings', 'ekwa-before-after-gallery'); ?></h2>
+                <p class="description"><?php esc_html_e('Configure the category carousel defaults. Build your shortcode from the Dashboard page.', 'ekwa-before-after-gallery'); ?></p>
+
+                <?php
+                $carousel = isset($settings['carousel']) ? $settings['carousel'] : array();
+                $carousel = wp_parse_args($carousel, array(
+                    'per_page_desktop' => 3,
+                    'per_page_tablet'  => 2,
+                    'per_page_mobile'  => 1,
+                    'show_arrows'      => 1,
+                    'show_dots'        => 1,
+                    'autoplay'         => 0,
+                    'autoplay_speed'   => 5000,
+                    'show_title'       => 1,
+                    'title_text'       => 'Before & After Results',
+                ));
+                ?>
+
+                <h3 style="margin-top: 10px; margin-bottom: 5px;"><?php esc_html_e('Responsive Slides Per View', 'ekwa-before-after-gallery'); ?></h3>
+                <p class="description" style="margin-bottom: 15px;"><?php esc_html_e('Set how many slides to show at each breakpoint, similar to Owl Carousel responsive options.', 'ekwa-before-after-gallery'); ?></p>
+
+                <div class="ekwa-bag-responsive-grid">
+                    <div class="ekwa-bag-responsive-col">
+                        <div class="ekwa-bag-responsive-icon"><span class="dashicons dashicons-desktop"></span></div>
+                        <label for="ekwa_bag_carousel_per_page_desktop"><?php esc_html_e('Desktop', 'ekwa-before-after-gallery'); ?></label>
+                        <span class="description"><?php esc_html_e('≥ 1025px', 'ekwa-before-after-gallery'); ?></span>
+                        <input type="number" name="ekwa_bag_carousel_per_page_desktop" id="ekwa_bag_carousel_per_page_desktop" value="<?php echo esc_attr($carousel['per_page_desktop']); ?>" min="1" max="6">
+                    </div>
+                    <div class="ekwa-bag-responsive-col">
+                        <div class="ekwa-bag-responsive-icon"><span class="dashicons dashicons-tablet"></span></div>
+                        <label for="ekwa_bag_carousel_per_page_tablet"><?php esc_html_e('Tablet', 'ekwa-before-after-gallery'); ?></label>
+                        <span class="description"><?php esc_html_e('601px – 1024px', 'ekwa-before-after-gallery'); ?></span>
+                        <input type="number" name="ekwa_bag_carousel_per_page_tablet" id="ekwa_bag_carousel_per_page_tablet" value="<?php echo esc_attr($carousel['per_page_tablet']); ?>" min="1" max="4">
+                    </div>
+                    <div class="ekwa-bag-responsive-col">
+                        <div class="ekwa-bag-responsive-icon"><span class="dashicons dashicons-smartphone"></span></div>
+                        <label for="ekwa_bag_carousel_per_page_mobile"><?php esc_html_e('Mobile', 'ekwa-before-after-gallery'); ?></label>
+                        <span class="description"><?php esc_html_e('≤ 600px', 'ekwa-before-after-gallery'); ?></span>
+                        <input type="number" name="ekwa_bag_carousel_per_page_mobile" id="ekwa_bag_carousel_per_page_mobile" value="<?php echo esc_attr($carousel['per_page_mobile']); ?>" min="1" max="2">
+                    </div>
+                </div>
+
+                <div class="ekwa-bag-settings-row">
+                    <label><?php esc_html_e('Show Arrows', 'ekwa-before-after-gallery'); ?></label>
+                    <div class="ekwa-bag-field">
+                        <label class="ekwa-bag-checkbox">
+                            <input type="checkbox" name="ekwa_bag_carousel_show_arrows" value="1" <?php checked($carousel['show_arrows'], 1); ?>>
+                            <?php esc_html_e('Show navigation arrows', 'ekwa-before-after-gallery'); ?>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="ekwa-bag-settings-row">
+                    <label><?php esc_html_e('Show Dots', 'ekwa-before-after-gallery'); ?></label>
+                    <div class="ekwa-bag-field">
+                        <label class="ekwa-bag-checkbox">
+                            <input type="checkbox" name="ekwa_bag_carousel_show_dots" value="1" <?php checked($carousel['show_dots'], 1); ?>>
+                            <?php esc_html_e('Show dot indicators', 'ekwa-before-after-gallery'); ?>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="ekwa-bag-settings-row">
+                    <label><?php esc_html_e('Autoplay', 'ekwa-before-after-gallery'); ?></label>
+                    <div class="ekwa-bag-field">
+                        <label class="ekwa-bag-checkbox">
+                            <input type="checkbox" name="ekwa_bag_carousel_autoplay" value="1" <?php checked($carousel['autoplay'], 1); ?>>
+                            <?php esc_html_e('Automatically advance slides', 'ekwa-before-after-gallery'); ?>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="ekwa-bag-settings-row">
+                    <label for="ekwa_bag_carousel_autoplay_speed"><?php esc_html_e('Autoplay Speed', 'ekwa-before-after-gallery'); ?></label>
+                    <div class="ekwa-bag-field">
+                        <input type="number" name="ekwa_bag_carousel_autoplay_speed" id="ekwa_bag_carousel_autoplay_speed" value="<?php echo esc_attr($carousel['autoplay_speed']); ?>" min="1000" max="15000" step="500">
+                        <span class="description"><?php esc_html_e('Time between slides in milliseconds (e.g., 5000 = 5 seconds)', 'ekwa-before-after-gallery'); ?></span>
+                    </div>
+                </div>
+
+                <div class="ekwa-bag-settings-row">
+                    <label><?php esc_html_e('Show Title', 'ekwa-before-after-gallery'); ?></label>
+                    <div class="ekwa-bag-field">
+                        <label class="ekwa-bag-checkbox">
+                            <input type="checkbox" name="ekwa_bag_carousel_show_title" value="1" <?php checked($carousel['show_title'], 1); ?>>
+                            <?php esc_html_e('Display a heading above the carousel', 'ekwa-before-after-gallery'); ?>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="ekwa-bag-settings-row">
+                    <label for="ekwa_bag_carousel_title_text"><?php esc_html_e('Carousel Title Text', 'ekwa-before-after-gallery'); ?></label>
+                    <div class="ekwa-bag-field">
+                        <input type="text" name="ekwa_bag_carousel_title_text" id="ekwa_bag_carousel_title_text" value="<?php echo esc_attr($carousel['title_text']); ?>" class="regular-text">
+                        <span class="description"><?php esc_html_e('The heading text shown above the carousel.', 'ekwa-before-after-gallery'); ?></span>
                     </div>
                 </div>
             </div>

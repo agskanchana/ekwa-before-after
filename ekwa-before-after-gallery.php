@@ -31,7 +31,7 @@ $myUpdateChecker->setBranch('main');
 
 
 //  plugin constants
-define('EKWA_BAG_VERSION', '1.3.4');
+define('EKWA_BAG_VERSION', '1.3.8');
 define('EKWA_BAG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('EKWA_BAG_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -313,9 +313,12 @@ class EKWA_Before_After_Gallery {
      * Frontend enqueue scripts
      */
     public function frontend_enqueue_scripts() {
-        // Only load on pages with our shortcode
         global $post;
-        if (is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'ekwa_gallery')) {
+        
+        $has_gallery = is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'ekwa_gallery');
+        $has_carousel = is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'ekwa_category_carousel');
+        
+        if ($has_gallery) {
             wp_enqueue_style('ekwa-bag-fonts', 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap', array(), null);
             wp_enqueue_style('ekwa-bag-fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', array(), '6.4.0');
             wp_enqueue_style('ekwa-bag-gallery', EKWA_BAG_PLUGIN_URL . 'assets/css/gallery.css', array(), EKWA_BAG_VERSION);
@@ -327,13 +330,22 @@ class EKWA_Before_After_Gallery {
                 'nonce'   => wp_create_nonce('ekwa_bag_frontend_nonce'),
             ));
         }
+        
+        if ($has_carousel) {
+            wp_enqueue_style('ekwa-bag-fonts', 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap', array(), null);
+            wp_enqueue_style('ekwa-bag-fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', array(), '6.4.0');
+            wp_enqueue_style('ekwa-bag-carousel', EKWA_BAG_PLUGIN_URL . 'assets/css/carousel.css', array(), EKWA_BAG_VERSION);
+            
+            wp_enqueue_script('ekwa-bag-carousel', EKWA_BAG_PLUGIN_URL . 'assets/js/carousel.js', array(), EKWA_BAG_VERSION, true);
+        }
     }
     
     /**
-     * Register shortcode
+     * Register shortcodes
      */
     public function register_shortcode() {
         add_shortcode('ekwa_gallery', array($this, 'render_shortcode'));
+        add_shortcode('ekwa_category_carousel', array($this, 'render_carousel_shortcode'));
     }
     
     /**
@@ -379,6 +391,126 @@ class EKWA_Before_After_Gallery {
         ob_start();
         include EKWA_BAG_PLUGIN_DIR . 'includes/frontend/gallery-template.php';
         return ob_get_clean();
+    }
+    
+    /**
+     * Render category carousel shortcode
+     */
+    public function render_carousel_shortcode($atts) {
+        static $carousel_instance = 0;
+        $carousel_instance++;
+        
+        $atts = shortcode_atts(array(
+            'category'         => '',    // Category slug - if empty, auto-detect from page slug
+            'limit'            => -1,
+            'per_page'         => '',    // Override slides to show (desktop)
+            'per_page_tablet'  => '',    // Override tablet slides
+            'per_page_mobile'  => '',    // Override mobile slides
+            'show_arrows'      => '',    // Override arrows setting
+            'show_dots'        => '',    // Override dots setting
+            'autoplay'         => '',    // Override autoplay setting
+            'title'            => '',    // Override carousel title
+        ), $atts, 'ekwa_category_carousel');
+        
+        // Auto-detect category from page slug if not set
+        $category_slug = $atts['category'];
+        if (empty($category_slug)) {
+            $category_slug = $this->detect_category_from_page_slug();
+        }
+        
+        // Get cases filtered by category
+        $carousel_atts = array(
+            'category' => $category_slug,
+            'limit'    => $atts['limit'],
+        );
+        $carousel_cases = $this->get_cases_data($carousel_atts);
+        $categories = $this->get_categories_tree();
+        
+        // Settings
+        $settings = get_option('ekwa_bag_settings', array());
+        $carousel_settings = isset($settings['carousel']) ? $settings['carousel'] : array();
+        $show_labels = isset($settings['show_before_after_labels']) ? $settings['show_before_after_labels'] : 1;
+        
+        // Resolve responsive per_page (shortcode attr > admin setting > default)
+        $per_page_desktop = !empty($atts['per_page']) ? absint($atts['per_page']) : (isset($carousel_settings['per_page_desktop']) ? absint($carousel_settings['per_page_desktop']) : 3);
+        $per_page_tablet = !empty($atts['per_page_tablet']) ? absint($atts['per_page_tablet']) : (isset($carousel_settings['per_page_tablet']) ? absint($carousel_settings['per_page_tablet']) : 2);
+        $per_page_mobile = !empty($atts['per_page_mobile']) ? absint($atts['per_page_mobile']) : (isset($carousel_settings['per_page_mobile']) ? absint($carousel_settings['per_page_mobile']) : 1);
+        $show_arrows = $atts['show_arrows'] !== '' ? ($atts['show_arrows'] === 'yes' ? 1 : 0) : (isset($carousel_settings['show_arrows']) ? $carousel_settings['show_arrows'] : 1);
+        $show_dots = $atts['show_dots'] !== '' ? ($atts['show_dots'] === 'yes' ? 1 : 0) : (isset($carousel_settings['show_dots']) ? $carousel_settings['show_dots'] : 1);
+        $autoplay = $atts['autoplay'] !== '' ? ($atts['autoplay'] === 'yes' ? 1 : 0) : (isset($carousel_settings['autoplay']) ? $carousel_settings['autoplay'] : 0);
+        $autoplay_speed = isset($carousel_settings['autoplay_speed']) ? absint($carousel_settings['autoplay_speed']) : 5000;
+        
+        // Override title if set in shortcode
+        if (!empty($atts['title'])) {
+            $settings['carousel']['title_text'] = $atts['title'];
+        }
+        
+        // Enqueue assets
+        wp_enqueue_style('ekwa-bag-fonts', 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap', array(), null);
+        wp_enqueue_style('ekwa-bag-fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', array(), '6.4.0');
+        wp_enqueue_style('ekwa-bag-carousel', EKWA_BAG_PLUGIN_URL . 'assets/css/carousel.css', array(), EKWA_BAG_VERSION);
+        wp_enqueue_script('ekwa-bag-carousel', EKWA_BAG_PLUGIN_URL . 'assets/js/carousel.js', array(), EKWA_BAG_VERSION, true);
+        
+        // Pass data via inline script for this instance
+        $carousel_instance_id = $carousel_instance;
+        $json_data = json_encode(array(
+            'cases'           => $carousel_cases,
+            'categories'      => $categories,
+            'slidesToShow'    => $per_page_desktop,
+            'slidesTablet'    => $per_page_tablet,
+            'slidesMobile'    => $per_page_mobile,
+            'showArrows'      => $show_arrows ? '1' : '0',
+            'showDots'        => $show_dots ? '1' : '0',
+            'autoplay'        => $autoplay ? '1' : '0',
+            'autoplaySpeed'   => $autoplay_speed,
+            'showLabels'      => $show_labels,
+        ));
+        
+        wp_add_inline_script('ekwa-bag-carousel', 'var ekwaBagCarousel_' . $carousel_instance_id . ' = ' . $json_data . ';', 'before');
+        
+        ob_start();
+        include EKWA_BAG_PLUGIN_DIR . 'includes/frontend/carousel-template.php';
+        return ob_get_clean();
+    }
+    
+    /**
+     * Detect category slug from the current page slug
+     */
+    private function detect_category_from_page_slug() {
+        global $post;
+        
+        if (!is_a($post, 'WP_Post')) {
+            return '';
+        }
+        
+        $page_slug = $post->post_name;
+        
+        if (empty($page_slug)) {
+            return '';
+        }
+        
+        // Check if there's a taxonomy term matching this page slug
+        $term = get_term_by('slug', $page_slug, 'ekwa_bag_category');
+        if ($term && !is_wp_error($term)) {
+            return $term->slug;
+        }
+        
+        // Also try matching partial slugs (e.g., page "teeth-whitening-results" -> term "teeth-whitening")
+        $all_terms = get_terms(array(
+            'taxonomy'   => 'ekwa_bag_category',
+            'hide_empty' => false,
+        ));
+        
+        if (!is_wp_error($all_terms)) {
+            foreach ($all_terms as $term) {
+                // Check if page slug contains the term slug
+                if (strpos($page_slug, $term->slug) !== false) {
+                    return $term->slug;
+                }
+            }
+        }
+        
+        return '';
     }
     
     /**
@@ -825,7 +957,10 @@ class EKWA_Before_After_Gallery {
      */
     public function output_dynamic_css() {
         global $post;
-        if (!is_a($post, 'WP_Post') || !has_shortcode($post->post_content, 'ekwa_gallery')) {
+        $has_gallery = is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'ekwa_gallery');
+        $has_carousel = is_a($post, 'WP_Post') && has_shortcode($post->post_content, 'ekwa_category_carousel');
+        
+        if (!$has_gallery && !$has_carousel) {
             return;
         }
         
@@ -855,6 +990,15 @@ class EKWA_Before_After_Gallery {
             }
             .ekwa-bag-card-grid {
                 grid-template-columns: repeat(<?php echo absint($settings['cards_per_row']); ?>, 1fr);
+            }
+            .ekwa-bag-carousel-wrapper {
+                --ekwa-bg: <?php echo esc_attr($settings['color_bg']); ?>;
+                --ekwa-card-bg: <?php echo esc_attr($settings['color_card_bg']); ?>;
+                --ekwa-text: <?php echo esc_attr($settings['color_text']); ?>;
+                --ekwa-text-soft: <?php echo esc_attr($settings['color_text_soft']); ?>;
+                --ekwa-accent: <?php echo esc_attr($settings['color_accent']); ?>;
+                --ekwa-accent-dark: <?php echo esc_attr($settings['color_accent_dark']); ?>;
+                --ekwa-border: <?php echo esc_attr($settings['color_border']); ?>;
             }
         </style>
         <?php

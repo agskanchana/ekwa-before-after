@@ -1,0 +1,581 @@
+/**
+ * EKWA Before After Gallery - Category Carousel Styles
+ */
+
+.ekwa-bag-carousel-wrapper {
+    --ekwa-bg: #f5f3f0;
+    --ekwa-card-bg: #ffffff;
+    --ekwa-text: #1a1a1a;
+    --ekwa-text-soft: #777777;
+    --ekwa-accent: #c9a87c;
+    --ekwa-accent-dark: #b08d5b;
+    --ekwa-border: #e8e4df;
+    --ekwa-shadow: 0 8px 30px rgba(0,0,0,0.06);
+    --ekwa-shadow-hover: 0 20px 50px rgba(0,0,0,0.12);
+}
+
+.ekwa-bag-carousel-wrapper {
+    font-family: 'Poppins', sans-serif;
+    color: var(--ekwa-text);
+    line-height: 1.6;
+    position: relative;
+    padding: 30px 0;
+}
+
+.ekwa-bag-carousel-wrapper * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Carousel Title */
+.ekwa-bag-carousel-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 400;
+    text-align: center;
+    margin-bottom: 24px;
+    color: var(--ekwa-text);
+}
+
+/* Carousel Container */
+.ekwa-bag-carousel-container {
+    position: relative;
+    padding: 0 50px;
+}
+
+.ekwa-bag-carousel-container.no-arrows {
+    padding: 0;
+}
+
+/* Viewport clips the track — separate from container padding */
+.ekwa-bag-carousel-viewport {
+    overflow: hidden;
+}
+
+/* Carousel Track */
+.ekwa-bag-carousel-track {
+    display: flex;
+    transition: transform 0.4s ease;
+    gap: 20px;
+    will-change: transform;
+}
+
+/* Carousel Slide */
+.ekwa-bag-carousel-slide {
+    flex: 0 0 auto;
+    cursor: pointer;
+    background: var(--ekwa-card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--ekwa-shadow);
+    border: 1px solid var(--ekwa-border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.ekwa-bag-carousel-slide:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--ekwa-shadow-hover);
+}
+
+/* Slide Images */
+.ekwa-bag-carousel-slide-images {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.ekwa-bag-carousel-slide-img {
+    position: relative;
+    overflow: hidden;
+}
+
+.ekwa-bag-carousel-slide-img img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.ekwa-bag-carousel-slide:hover .ekwa-bag-carousel-slide-img img {
+    transform: scale(1.03);
+}
+
+.ekwa-bag-carousel-slide-label {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 8px;
+    border-radius: 3px;
+}
+
+.ekwa-bag-carousel-slide-img.after .ekwa-bag-carousel-slide-label {
+    background: var(--ekwa-accent);
+    color: #fff;
+}
+
+/* Combined image mode */
+.ekwa-bag-carousel-slide-images.ekwa-bag-carousel-combined .ekwa-bag-carousel-slide-img img {
+    height: 320px;
+}
+
+.ekwa-bag-carousel-slide-images.ekwa-bag-carousel-combined .ekwa-bag-carousel-slide-label.left {
+    bottom: 8px;
+    left: 8px;
+}
+
+.ekwa-bag-carousel-slide-images.ekwa-bag-carousel-combined .ekwa-bag-carousel-slide-label.right {
+    bottom: 8px;
+    left: auto;
+    right: 8px;
+    background: var(--ekwa-accent);
+}
+
+/* Separator */
+.ekwa-bag-carousel-separator {
+    height: 2px;
+    background: var(--ekwa-border);
+}
+
+/* Slide Content */
+.ekwa-bag-carousel-slide-content {
+    padding: 12px 14px;
+}
+
+.ekwa-bag-carousel-slide-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ekwa-text);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ekwa-bag-carousel-slide-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: var(--ekwa-text-soft);
+}
+
+.ekwa-bag-carousel-slide-views i {
+    margin-right: 4px;
+}
+
+.ekwa-bag-carousel-slide-action {
+    color: var(--ekwa-accent);
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.ekwa-bag-carousel-slide:hover .ekwa-bag-carousel-slide-action {
+    color: var(--ekwa-accent-dark);
+}
+
+/* Navigation Arrows */
+.ekwa-bag-carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--ekwa-card-bg);
+    border: 1px solid var(--ekwa-border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s;
+    color: var(--ekwa-text);
+    font-size: 14px;
+}
+
+.ekwa-bag-carousel-arrow:hover {
+    background: var(--ekwa-accent);
+    color: #fff;
+    border-color: var(--ekwa-accent);
+}
+
+.ekwa-bag-carousel-arrow:disabled {
+    opacity: 0.3;
+    cursor: default;
+    pointer-events: none;
+}
+
+.ekwa-bag-carousel-arrow.prev {
+    left: 0;
+}
+
+.ekwa-bag-carousel-arrow.next {
+    right: 0;
+}
+
+/* Dots Navigation */
+.ekwa-bag-carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.ekwa-bag-carousel-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--ekwa-border);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+}
+
+.ekwa-bag-carousel-dot:hover {
+    background: var(--ekwa-accent-dark);
+}
+
+.ekwa-bag-carousel-dot.active {
+    background: var(--ekwa-accent);
+    transform: scale(1.2);
+}
+
+/* Hide labels when disabled */
+.ekwa-bag-carousel-wrapper[data-show-labels="0"] .ekwa-bag-carousel-slide-label {
+    display: none;
+}
+
+/* Empty State */
+.ekwa-bag-carousel-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--ekwa-text-soft);
+}
+
+.ekwa-bag-carousel-empty i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+/* =============================================
+   Carousel Modal - reuses main gallery modal
+   ============================================= */
+.ekwa-bag-carousel-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.ekwa-bag-carousel-modal.active {
+    visibility: visible;
+    opacity: 1;
+}
+
+.ekwa-bag-carousel-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+}
+
+.ekwa-bag-carousel-modal-content {
+    position: relative;
+    background: var(--ekwa-card-bg, #fff);
+    border-radius: 16px;
+    max-width: 900px;
+    width: 95%;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.ekwa-bag-carousel-modal.active .ekwa-bag-carousel-modal-content {
+    transform: scale(1);
+}
+
+/* Modal Header */
+.ekwa-bag-carousel-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--ekwa-border, #e8e4df);
+}
+
+.ekwa-bag-carousel-modal-header-info {
+    flex: 1;
+}
+
+.ekwa-bag-carousel-modal-breadcrumb {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--ekwa-accent, #c9a87c);
+    margin-bottom: 4px;
+}
+
+.ekwa-bag-carousel-modal-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: var(--ekwa-text, #1a1a1a);
+}
+
+.ekwa-bag-carousel-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--ekwa-text-soft, #777);
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: all 0.2s;
+}
+
+.ekwa-bag-carousel-modal-close:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+/* Modal Body */
+.ekwa-bag-carousel-modal-body {
+    overflow-y: auto;
+    padding: 20px 24px;
+}
+
+/* Modal Images */
+.ekwa-bag-carousel-modal-images {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.ekwa-bag-carousel-modal-img-box {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.ekwa-bag-carousel-modal-img-box img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.ekwa-bag-carousel-modal-img-tag {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.65);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 4px;
+}
+
+.ekwa-bag-carousel-modal-img-box.after .ekwa-bag-carousel-modal-img-tag {
+    background: var(--ekwa-accent, #c9a87c);
+}
+
+/* Combined Image Mode - Modal */
+.ekwa-bag-carousel-modal-images.ekwa-bag-carousel-combined-modal {
+    grid-template-columns: 1fr;
+}
+
+.ekwa-bag-carousel-modal-images.ekwa-bag-carousel-combined-modal .ekwa-bag-carousel-modal-img-box.after {
+    display: none;
+}
+
+.ekwa-bag-carousel-modal-images.ekwa-bag-carousel-combined-modal .ekwa-bag-carousel-modal-img-tag {
+    display: none;
+}
+
+/* Hide labels when disabled */
+.ekwa-bag-carousel-modal-images.ekwa-bag-carousel-no-labels .ekwa-bag-carousel-modal-img-tag {
+    display: none;
+}
+
+/* Modal Description */
+.ekwa-bag-carousel-modal-desc {
+    padding: 12px 0;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.ekwa-bag-carousel-modal-desc p {
+    color: var(--ekwa-text-soft, #777);
+    font-size: 0.9rem;
+    line-height: 1.7;
+}
+
+/* Modal Thumbnails */
+.ekwa-bag-carousel-modal-thumbs-section {
+    margin-top: 12px;
+}
+
+.ekwa-bag-carousel-modal-thumbs-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--ekwa-text-soft, #777);
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.ekwa-bag-carousel-modal-thumbs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.ekwa-bag-carousel-modal-thumb {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 2px;
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.ekwa-bag-carousel-modal-thumb:hover {
+    border-color: var(--ekwa-border, #e8e4df);
+}
+
+.ekwa-bag-carousel-modal-thumb.active {
+    border-color: var(--ekwa-accent, #c9a87c);
+}
+
+.ekwa-bag-carousel-modal-thumb img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    display: block;
+}
+
+.ekwa-bag-carousel-modal-combined-thumb img {
+    width: 100px;
+    height: 50px;
+}
+
+/* Modal Footer */
+.ekwa-bag-carousel-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 24px;
+    border-top: 1px solid var(--ekwa-border, #e8e4df);
+}
+
+.ekwa-bag-carousel-modal-nav-btn {
+    background: none;
+    border: 1px solid var(--ekwa-border, #e8e4df);
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--ekwa-text, #1a1a1a);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.ekwa-bag-carousel-modal-nav-btn:hover:not(:disabled) {
+    background: var(--ekwa-accent, #c9a87c);
+    color: #fff;
+    border-color: var(--ekwa-accent, #c9a87c);
+}
+
+.ekwa-bag-carousel-modal-nav-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.ekwa-bag-carousel-modal-counter {
+    font-size: 0.85rem;
+    color: var(--ekwa-text-soft, #777);
+}
+
+.ekwa-bag-carousel-modal-counter strong {
+    color: var(--ekwa-text, #1a1a1a);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .ekwa-bag-carousel-container {
+        padding: 0 45px;
+    }
+
+    .ekwa-bag-carousel-arrow {
+        width: 36px;
+        height: 36px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 768px) {
+    .ekwa-bag-carousel-container {
+        padding: 0 40px;
+    }
+
+    .ekwa-bag-carousel-arrow {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+    }
+
+    .ekwa-bag-carousel-slide-img img {
+        height: 120px;
+    }
+
+    .ekwa-bag-carousel-modal-content {
+        width: 98%;
+        max-height: 95vh;
+    }
+
+    .ekwa-bag-carousel-modal-images {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .ekwa-bag-carousel-container {
+        padding: 0 32px;
+    }
+
+    .ekwa-bag-carousel-slide-content {
+        padding: 8px 10px;
+    }
+
+    .ekwa-bag-carousel-slide-title {
+        font-size: 0.8rem;
+    }
+}
