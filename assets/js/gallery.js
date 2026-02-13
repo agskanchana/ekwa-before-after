@@ -1,10 +1,17 @@
 /**
- * EKWA Before After Gallery - Frontend JavaScript
+ * EKWA Before After Gallery - Frontend JavaScript (Vanilla JS)
  */
 
-
-(function($) {
+(function() {
     'use strict';
+
+    // Helper functions
+    function qs(selector, parent) {
+        return (parent || document).querySelector(selector);
+    }
+    function qsa(selector, parent) {
+        return (parent || document).querySelectorAll(selector);
+    }
 
     // Main Gallery Class
     class EKWABeforeAfterGallery {
@@ -64,60 +71,70 @@
         }
 
         cacheElements() {
-            this.$wrapper = $('.ekwa-bag-wrapper');
-            this.$mainTags = $('#ekwa-bag-mainTags');
-            this.$subTags = $('#ekwa-bag-subTags');
-            this.$cardGrid = $('#ekwa-bag-cardGrid');
-            this.$resultsCount = $('#ekwa-bag-resultsCount');
-            this.$clearBtn = $('#ekwa-bag-clearBtn');
-            this.$modal = $('#ekwa-bag-modal');
-            this.$modalBackdrop = $('#ekwa-bag-modalBackdrop');
-            this.$modalClose = $('#ekwa-bag-modalClose');
-            this.$modalBreadcrumb = $('#ekwa-bag-modalBreadcrumb');
-            this.$modalTitle = $('#ekwa-bag-modalTitle');
-            this.$modalDesc = $('#ekwa-bag-modalDesc');
-            this.$modalBefore = $('#ekwa-bag-modalBefore');
-            this.$modalAfter = $('#ekwa-bag-modalAfter');
-            this.$modalThumbs = $('#ekwa-bag-modalThumbs');
-            this.$modalViewCount = $('#ekwa-bag-modalViewCount');
-            this.$modalCurrentNum = $('#ekwa-bag-modalCurrentNum');
-            this.$modalTotalNum = $('#ekwa-bag-modalTotalNum');
-            this.$modalPrev = $('#ekwa-bag-modalPrev');
-            this.$modalNext = $('#ekwa-bag-modalNext');
+            this.elWrapper = qs('.ekwa-bag-wrapper');
+            this.elMainTags = qs('#ekwa-bag-mainTags');
+            this.elSubTags = qs('#ekwa-bag-subTags');
+            this.elCardGrid = qs('#ekwa-bag-cardGrid');
+            this.elResultsCount = qs('#ekwa-bag-resultsCount');
+            this.elClearBtn = qs('#ekwa-bag-clearBtn');
+            this.elModal = qs('#ekwa-bag-modal');
+            this.elModalBackdrop = qs('#ekwa-bag-modalBackdrop');
+            this.elModalClose = qs('#ekwa-bag-modalClose');
+            this.elModalBreadcrumb = qs('#ekwa-bag-modalBreadcrumb');
+            this.elModalTitle = qs('#ekwa-bag-modalTitle');
+            this.elModalDesc = qs('#ekwa-bag-modalDesc');
+            this.elModalBefore = qs('#ekwa-bag-modalBefore');
+            this.elModalAfter = qs('#ekwa-bag-modalAfter');
+            this.elModalThumbs = qs('#ekwa-bag-modalThumbs');
+            this.elModalViewCount = qs('#ekwa-bag-modalViewCount');
+            this.elModalCurrentNum = qs('#ekwa-bag-modalCurrentNum');
+            this.elModalTotalNum = qs('#ekwa-bag-modalTotalNum');
+            this.elModalPrev = qs('#ekwa-bag-modalPrev');
+            this.elModalNext = qs('#ekwa-bag-modalNext');
         }
 
         bindEvents() {
             const self = this;
 
             // Clear button
-            this.$clearBtn.on('click', function() {
-                self.activeMainCat = 'all';
-                self.activeSubCat = null;
-                self.renderMainTags();
-                self.renderSubTags();
-                self.filterCases();
-            });
+            if (this.elClearBtn) {
+                this.elClearBtn.addEventListener('click', function() {
+                    self.activeMainCat = 'all';
+                    self.activeSubCat = null;
+                    self.renderMainTags();
+                    self.renderSubTags();
+                    self.filterCases();
+                });
+            }
 
             // Modal events
-            this.$modalClose.on('click', function() {
-                self.closeModal();
-            });
+            if (this.elModalClose) {
+                this.elModalClose.addEventListener('click', function() {
+                    self.closeModal();
+                });
+            }
 
-            this.$modalBackdrop.on('click', function() {
-                self.closeModal();
-            });
+            if (this.elModalBackdrop) {
+                this.elModalBackdrop.addEventListener('click', function() {
+                    self.closeModal();
+                });
+            }
 
-            this.$modalPrev.on('click', function() {
-                self.navCase(-1);
-            });
+            if (this.elModalPrev) {
+                this.elModalPrev.addEventListener('click', function() {
+                    self.navCase(-1);
+                });
+            }
 
-            this.$modalNext.on('click', function() {
-                self.navCase(1);
-            });
+            if (this.elModalNext) {
+                this.elModalNext.addEventListener('click', function() {
+                    self.navCase(1);
+                });
+            }
 
             // Keyboard events
-            $(document).on('keydown', function(e) {
-                if (!self.$modal.hasClass('active')) return;
+            document.addEventListener('keydown', function(e) {
+                if (!self.elModal || !self.elModal.classList.contains('active')) return;
                 
                 if (e.key === 'Escape') self.closeModal();
                 if (e.key === 'ArrowLeft') self.navCase(-1);
@@ -144,15 +161,17 @@
                 `;
             });
 
-            this.$mainTags.html(html);
+            this.elMainTags.innerHTML = html;
 
             // Bind click events
-            this.$mainTags.find('.ekwa-bag-tag-btn').on('click', function() {
-                self.activeMainCat = $(this).data('cat');
-                self.activeSubCat = null;
-                self.renderMainTags();
-                self.renderSubTags();
-                self.filterCases();
+            qsa('.ekwa-bag-tag-btn', this.elMainTags).forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    self.activeMainCat = this.dataset.cat;
+                    self.activeSubCat = null;
+                    self.renderMainTags();
+                    self.renderSubTags();
+                    self.filterCases();
+                });
             });
         }
 
@@ -161,7 +180,8 @@
             const cat = this.categoryTree[this.activeMainCat];
 
             if (!cat || !cat.subCats || cat.subCats.length === 0) {
-                this.$subTags.removeClass('visible').html('');
+                this.elSubTags.classList.remove('visible');
+                this.elSubTags.innerHTML = '';
                 return;
             }
 
@@ -179,14 +199,17 @@
 
             html += '</div>';
 
-            this.$subTags.html(html).addClass('visible');
+            this.elSubTags.innerHTML = html;
+            this.elSubTags.classList.add('visible');
 
             // Bind click events
-            this.$subTags.find('.ekwa-bag-sub-tag-btn').on('click', function() {
-                const sub = $(this).data('sub');
-                self.activeSubCat = sub === 'all' ? null : sub;
-                self.renderSubTags();
-                self.filterCases();
+            qsa('.ekwa-bag-sub-tag-btn', this.elSubTags).forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const sub = this.dataset.sub;
+                    self.activeSubCat = sub === 'all' ? null : sub;
+                    self.renderSubTags();
+                    self.filterCases();
+                });
             });
         }
 
@@ -201,8 +224,8 @@
                 this.filtered = this.cases.filter(c => c.mainCat === this.activeMainCat);
             }
 
-            this.$resultsCount.text(this.filtered.length);
-            this.$clearBtn.toggleClass('visible', this.activeMainCat !== 'all');
+            this.elResultsCount.textContent = this.filtered.length;
+            this.elClearBtn.classList.toggle('visible', this.activeMainCat !== 'all');
             this.renderGrid();
         }
 
@@ -220,25 +243,25 @@
 
             if (this.cases.length === 0) {
                 // No cases at all - show "add from admin" message
-                this.$cardGrid.html(`
+                this.elCardGrid.innerHTML = `
                     <div class="ekwa-bag-empty-state">
                         <i class="fas fa-images"></i>
                         <h3>No Cases Found</h3>
                         <p>Add your first before/after case from the admin panel.</p>
                     </div>
-                `);
+                `;
                 return;
             }
 
             if (this.filtered.length === 0) {
                 // Cases exist but none match filters
-                this.$cardGrid.html(`
+                this.elCardGrid.innerHTML = `
                     <div class="ekwa-bag-empty-state">
                         <i class="fas fa-search"></i>
                         <h3>No Results Found</h3>
                         <p>Try selecting a different category</p>
                     </div>
-                `);
+                `;
                 return;
             }
 
@@ -306,12 +329,14 @@
                 `;
             });
 
-            this.$cardGrid.html(html);
+            this.elCardGrid.innerHTML = html;
 
             // Bind click events
-            this.$cardGrid.find('.' + cardClass).on('click', function() {
-                const id = parseInt($(this).data('id'));
-                self.openModal(id);
+            qsa('.' + cardClass, this.elCardGrid).forEach(function(card) {
+                card.addEventListener('click', function() {
+                    const id = parseInt(this.dataset.id);
+                    self.openModal(id);
+                });
             });
         }
 
@@ -320,15 +345,15 @@
             this.currentCaseIdx = this.filtered.findIndex(c => c.id === id);
             this.currentViewIdx = 0;
             
-            this.$modal.addClass('active');
-            $('body').css('overflow', 'hidden');
+            this.elModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
             
             this.updateModal();
         }
 
         closeModal() {
-            this.$modal.removeClass('active');
-            $('body').css('overflow', '');
+            this.elModal.classList.remove('active');
+            document.body.style.overflow = '';
         }
 
         updateModal() {
@@ -339,49 +364,49 @@
             const subCatObj = this.categoryTree[this.currentCase.mainCat]?.subCats?.find(s => s.key === this.currentCase.subCat);
             const subCatLabel = subCatObj?.label || '';
 
-            this.$modalBreadcrumb.text(`${mainCatLabel} › ${subCatLabel}`);
-            this.$modalTitle.text(this.currentCase.title);
-            this.$modalDesc.html(`<p>${this.currentCase.desc}</p>`);
+            this.elModalBreadcrumb.textContent = `${mainCatLabel} › ${subCatLabel}`;
+            this.elModalTitle.textContent = this.currentCase.title;
+            this.elModalDesc.innerHTML = `<p>${this.currentCase.desc}</p>`;
             
             // Handle combined vs separate image display
-            const $modalImages = $('#ekwa-bag-modalImages');
+            const elModalImages = qs('#ekwa-bag-modalImages');
             if (isCombined) {
                 // Single combined image - hide after image box and expand before to full width
-                $modalImages.addClass('ekwa-bag-combined-modal');
+                elModalImages.classList.add('ekwa-bag-combined-modal');
                 if (!this.showLabels) {
-                    $modalImages.addClass('ekwa-bag-no-labels');
+                    elModalImages.classList.add('ekwa-bag-no-labels');
                 } else {
-                    $modalImages.removeClass('ekwa-bag-no-labels');
+                    elModalImages.classList.remove('ekwa-bag-no-labels');
                 }
                 
-                this.$modalBefore.attr('src', view.before)
-                                  .attr('alt', view.beforeAlt || 'Combined Before/After');
-                if (view.beforeWidth) this.$modalBefore.attr('width', view.beforeWidth);
-                if (view.beforeHeight) this.$modalBefore.attr('height', view.beforeHeight);
+                this.elModalBefore.setAttribute('src', view.before);
+                this.elModalBefore.setAttribute('alt', view.beforeAlt || 'Combined Before/After');
+                if (view.beforeWidth) this.elModalBefore.setAttribute('width', view.beforeWidth);
+                if (view.beforeHeight) this.elModalBefore.setAttribute('height', view.beforeHeight);
             } else {
                 // Separate before/after images
-                $modalImages.removeClass('ekwa-bag-combined-modal');
+                elModalImages.classList.remove('ekwa-bag-combined-modal');
                 if (!this.showLabels) {
-                    $modalImages.addClass('ekwa-bag-no-labels');
+                    elModalImages.classList.add('ekwa-bag-no-labels');
                 } else {
-                    $modalImages.removeClass('ekwa-bag-no-labels');
+                    elModalImages.classList.remove('ekwa-bag-no-labels');
                 }
                 
                 // Update modal images with proper alt text and dimensions
-                this.$modalBefore.attr('src', view.before)
-                                  .attr('alt', view.beforeAlt || 'Before');
-                if (view.beforeWidth) this.$modalBefore.attr('width', view.beforeWidth);
-                if (view.beforeHeight) this.$modalBefore.attr('height', view.beforeHeight);
+                this.elModalBefore.setAttribute('src', view.before);
+                this.elModalBefore.setAttribute('alt', view.beforeAlt || 'Before');
+                if (view.beforeWidth) this.elModalBefore.setAttribute('width', view.beforeWidth);
+                if (view.beforeHeight) this.elModalBefore.setAttribute('height', view.beforeHeight);
                 
-                this.$modalAfter.attr('src', view.after)
-                                 .attr('alt', view.afterAlt || 'After');
-                if (view.afterWidth) this.$modalAfter.attr('width', view.afterWidth);
-                if (view.afterHeight) this.$modalAfter.attr('height', view.afterHeight);
+                this.elModalAfter.setAttribute('src', view.after);
+                this.elModalAfter.setAttribute('alt', view.afterAlt || 'After');
+                if (view.afterWidth) this.elModalAfter.setAttribute('width', view.afterWidth);
+                if (view.afterHeight) this.elModalAfter.setAttribute('height', view.afterHeight);
             }
             
-            this.$modalViewCount.text(this.currentCase.sets.length);
-            this.$modalCurrentNum.text(this.currentCaseIdx + 1);
-            this.$modalTotalNum.text(this.filtered.length);
+            this.elModalViewCount.textContent = this.currentCase.sets.length;
+            this.elModalCurrentNum.textContent = this.currentCaseIdx + 1;
+            this.elModalTotalNum.textContent = this.filtered.length;
 
             // Thumbnails
             let thumbsHtml = '';
@@ -404,17 +429,19 @@
                     `;
                 }
             });
-            this.$modalThumbs.html(thumbsHtml);
+            this.elModalThumbs.innerHTML = thumbsHtml;
 
             // Bind thumbnail click
-            this.$modalThumbs.find('.ekwa-bag-modal-thumb').on('click', function() {
-                self.currentViewIdx = parseInt($(this).data('idx'));
-                self.updateModal();
+            qsa('.ekwa-bag-modal-thumb', this.elModalThumbs).forEach(function(thumb) {
+                thumb.addEventListener('click', function() {
+                    self.currentViewIdx = parseInt(this.dataset.idx);
+                    self.updateModal();
+                });
             });
 
             // Nav buttons
-            this.$modalPrev.prop('disabled', this.currentCaseIdx === 0);
-            this.$modalNext.prop('disabled', this.currentCaseIdx === this.filtered.length - 1);
+            this.elModalPrev.disabled = this.currentCaseIdx === 0;
+            this.elModalNext.disabled = this.currentCaseIdx === this.filtered.length - 1;
         }
 
         navCase(dir) {
@@ -431,10 +458,16 @@
     }
 
     // Initialize when document is ready
-    $(document).ready(function() {
-        if ($('.ekwa-bag-wrapper').length) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initGallery);
+    } else {
+        initGallery();
+    }
+
+    function initGallery() {
+        if (document.querySelector('.ekwa-bag-wrapper')) {
             new EKWABeforeAfterGallery();
         }
-    });
+    }
 
-})(jQuery);
+})();

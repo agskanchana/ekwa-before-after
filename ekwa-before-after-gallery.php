@@ -3,7 +3,7 @@
  * Plugin Name: EKWA Before After Gallery
  * Plugin URI: https://ekwa.com
  * Description: A beautiful before and after gallery with stacked card design for dental and medical practices.
- * Version: 1.0.7
+ * Version: 1.0.8
  * Author: EKWA
  * Author URI: https://ekwa.com
  * License: GPL v2 or later
@@ -321,7 +321,7 @@ class EKWA_Before_After_Gallery {
             wp_enqueue_style('ekwa-bag-fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', array(), '6.4.0');
             wp_enqueue_style('ekwa-bag-gallery', EKWA_BAG_PLUGIN_URL . 'assets/css/gallery.css', array(), EKWA_BAG_VERSION);
             
-            wp_enqueue_script('ekwa-bag-gallery', EKWA_BAG_PLUGIN_URL . 'assets/js/gallery.js', array('jqueryjs-js'), EKWA_BAG_VERSION, true);
+            wp_enqueue_script('ekwa-bag-gallery', EKWA_BAG_PLUGIN_URL . 'assets/js/gallery.js', array(), EKWA_BAG_VERSION, true);
             
             wp_localize_script('ekwa-bag-gallery', 'ekwaBagFrontend', array(
                 'ajaxUrl' => admin_url('admin-ajax.php'),
@@ -357,7 +357,7 @@ class EKWA_Before_After_Gallery {
         wp_enqueue_style('ekwa-bag-fontawesome', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css', array(), '6.4.0');
         wp_enqueue_style('ekwa-bag-gallery', EKWA_BAG_PLUGIN_URL . 'assets/css/gallery.css', array(), EKWA_BAG_VERSION);
         
-        wp_enqueue_script('ekwa-bag-gallery', EKWA_BAG_PLUGIN_URL . 'assets/js/gallery.js', array('jqueryjs-js'), EKWA_BAG_VERSION, true);
+        wp_enqueue_script('ekwa-bag-gallery', EKWA_BAG_PLUGIN_URL . 'assets/js/gallery.js', array(), EKWA_BAG_VERSION, true);
         
         // Get settings for card design
         $settings = get_option('ekwa_bag_settings', array());
