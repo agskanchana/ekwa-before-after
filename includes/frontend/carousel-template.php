@@ -18,7 +18,11 @@ $show_title = isset($carousel_settings['show_title']) ? $carousel_settings['show
 $carousel_title_text = isset($carousel_settings['title_text']) ? $carousel_settings['title_text'] : __('Before & After Results', 'ekwa-before-after-gallery');
 ?>
 
-<div class="ekwa-bag-carousel-wrapper" data-instance-id="<?php echo esc_attr($carousel_instance_id); ?>" data-show-labels="<?php echo esc_attr($show_labels); ?>">
+<?php
+$custom_tpl_enabled = isset($carousel_settings['custom_card_template_enabled']) ? $carousel_settings['custom_card_template_enabled'] : 0;
+$wrapper_class = 'ekwa-bag-carousel-wrapper' . ($custom_tpl_enabled ? ' ekwa-bag-custom-tpl' : '');
+?>
+<div class="<?php echo esc_attr($wrapper_class); ?>" data-instance-id="<?php echo esc_attr($carousel_instance_id); ?>" data-show-labels="<?php echo esc_attr($show_labels); ?>">
     
     <?php if ($show_title && !empty($carousel_title_text)) : ?>
     <h2 class="ekwa-bag-carousel-title"><?php echo esc_html($carousel_title_text); ?></h2>

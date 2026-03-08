@@ -304,6 +304,7 @@
             this.initBulkTools();
             this.initImportExport();
             this.initCardDesignSelector();
+            this.initCustomTemplateToggle();
         }
 
         // Card Design Selector
@@ -319,6 +320,139 @@
 
             // Initial state - mark selected option
             $selector.find('input[type="radio"]:checked').closest('.ekwa-bag-design-option').addClass('selected');
+        }
+
+        // Custom Card Template Toggle + CodeMirror + Validation
+        initCustomTemplateToggle() {
+            const self = this;
+            this.templateEditor = null;
+
+            const $checkbox = $('#ekwa_bag_carousel_custom_card_template_enabled');
+            const $section = $('#ekwa-bag-custom-template-section');
+
+            $checkbox.on('change', function() {
+                const show = $(this).is(':checked');
+                $section.toggle(show);
+                if (show && !self.templateEditor) {
+                    self.initCodeMirrorEditor();
+                }
+                if (show && self.templateEditor) {
+                    self.templateEditor.codemirror.refresh();
+                }
+            }).trigger('change');
+
+            // Block form submission if there are template validation errors
+            this.$form.on('submit', function(e) {
+                if (!$checkbox.is(':checked')) return;
+                // Sync CodeMirror value into textarea before reading
+                if (self.templateEditor) {
+                    $('#ekwa_bag_carousel_custom_card_template').val(self.templateEditor.codemirror.getValue());
+                }
+                var val = $('#ekwa_bag_carousel_custom_card_template').val();
+                var errors = self.validateTemplate(val);
+                if (errors.length) {
+                    e.preventDefault();
+                    self.showTemplateErrors(errors);
+                    // Switch to carousel tab so user sees the error
+                    $('.ekwa-bag-tabs .nav-tab[data-tab="carousel"]').trigger('click');
+                    $('html, body').animate({ scrollTop: $('#ekwa-bag-template-errors').offset().top - 60 }, 300);
+                }
+            });
+        }
+
+        initCodeMirrorEditor() {
+            const self = this;
+            const textarea = document.getElementById('ekwa_bag_carousel_custom_card_template');
+            if (!textarea) return;
+
+            // wp.codeEditor is provided by wp-codemirror (enqueued via wp_enqueue_code_editor)
+            const hasCmApi = typeof wp !== 'undefined' && typeof wp.codeEditor !== 'undefined';
+            const hasCmSettings = typeof window.ekwaCmSettings !== 'undefined';
+
+            if (hasCmApi && hasCmSettings) {
+                try {
+                    this.templateEditor = wp.codeEditor.initialize(textarea, window.ekwaCmSettings);
+                    // Validate on change
+                    this.templateEditor.codemirror.on('change', function() {
+                        var val = self.templateEditor.codemirror.getValue();
+                        var errors = self.validateTemplate(val);
+                        self.showTemplateErrors(errors);
+                    });
+                    // Initial validation
+                    var initialErrors = this.validateTemplate(this.templateEditor.codemirror.getValue());
+                    this.showTemplateErrors(initialErrors);
+                } catch (e) {
+                    console.warn('EKWA: CodeMirror init failed, falling back to textarea.', e);
+                    this.initPlainTextareaValidation(textarea);
+                }
+            } else {
+                this.initPlainTextareaValidation(textarea);
+            }
+        }
+
+        initPlainTextareaValidation(textarea) {
+            const self = this;
+            $(textarea).on('input', function() {
+                var errors = self.validateTemplate($(this).val());
+                self.showTemplateErrors(errors);
+            });
+            var initialErrors = this.validateTemplate($(textarea).val());
+            this.showTemplateErrors(initialErrors);
+        }
+
+        validateTemplate(html) {
+            var errors = [];
+            if (!html || !html.trim()) return errors;
+
+            // Check for <script> tags
+            if (/<script[\s>]/i.test(html)) {
+                errors.push('&lt;script&gt; tags are not allowed in the card template.');
+            }
+
+            // Check for <style> tags
+            if (/<style[\s>]/i.test(html)) {
+                errors.push('&lt;style&gt; tags are not allowed in the card template. Use your theme\'s CSS instead.');
+            }
+
+            // Check for on* event attributes (onclick, onerror, etc.)
+            if (/\bon\w+\s*=/i.test(html)) {
+                errors.push('Inline event handlers (onclick, onerror, etc.) are not allowed.');
+            }
+
+            // Check for invalid template tags
+            var validTags = [
+                'before_image', 'after_image', 'combined_image',
+                'before_image_url', 'after_image_url', 'combined_image_url',
+                'title', 'description', 'view_count',
+                'category', 'subcategory'
+            ];
+            var tagRegex = /\{\{(\w+)\}\}/g;
+            var match;
+            while ((match = tagRegex.exec(html)) !== null) {
+                if (validTags.indexOf(match[1]) === -1) {
+                    errors.push('<code>{{' + match[1] + '}}</code> is not a valid template tag.');
+                }
+            }
+
+            return errors;
+        }
+
+        showTemplateErrors(errors) {
+            var $el = $('#ekwa-bag-template-errors');
+            if (!$el.length) return;
+
+            if (!errors.length) {
+                $el.hide().empty();
+                return;
+            }
+
+            var html = '<div class="ekwa-bag-template-error-icon"><span class="dashicons dashicons-warning"></span></div>';
+            html += '<ul>';
+            errors.forEach(function(err) {
+                html += '<li>' + err + '</li>';
+            });
+            html += '</ul>';
+            $el.html(html).show();
         }
 
         // Tab Navigation

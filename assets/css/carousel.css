@@ -65,6 +65,10 @@
 .ekwa-bag-carousel-slide {
     flex: 0 0 auto;
     cursor: pointer;
+}
+
+/* Default card styling — skipped when custom template is active */
+.ekwa-bag-carousel-wrapper:not(.ekwa-bag-custom-tpl) .ekwa-bag-carousel-slide {
     background: var(--ekwa-card-bg);
     border-radius: 12px;
     overflow: hidden;
@@ -73,7 +77,7 @@
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.ekwa-bag-carousel-slide:hover {
+.ekwa-bag-carousel-wrapper:not(.ekwa-bag-custom-tpl) .ekwa-bag-carousel-slide:hover {
     transform: translateY(-4px);
     box-shadow: var(--ekwa-shadow-hover);
 }
@@ -98,7 +102,7 @@
     transition: transform 0.3s ease;
 }
 
-.ekwa-bag-carousel-slide:hover .ekwa-bag-carousel-slide-img img {
+.ekwa-bag-carousel-wrapper:not(.ekwa-bag-custom-tpl) .ekwa-bag-carousel-slide:hover .ekwa-bag-carousel-slide-img img {
     transform: scale(1.03);
 }
 
