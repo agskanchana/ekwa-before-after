@@ -31,7 +31,7 @@ $myUpdateChecker->setBranch('main');
 
 
 //  plugin constants
-define('EKWA_BAG_VERSION', '1.3.8');
+define('EKWA_BAG_VERSION', '1.4.0');
 define('EKWA_BAG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('EKWA_BAG_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -292,6 +292,15 @@ class EKWA_Before_After_Gallery {
             if (strpos($hook, 'ekwa-bag-settings') !== false) {
                 wp_enqueue_style('wp-color-picker');
                 wp_enqueue_script('wp-color-picker');
+                
+                // Enqueue CodeMirror for custom template editor
+                $cm_settings = wp_enqueue_code_editor(array('type' => 'text/html'));
+                if ($cm_settings !== false) {
+                    wp_add_inline_script('ekwa-bag-admin', sprintf(
+                        'window.ekwaCmSettings = %s;',
+                        wp_json_encode($cm_settings)
+                    ), 'before');
+                }
             }
             
             wp_enqueue_style('ekwa-bag-admin', EKWA_BAG_PLUGIN_URL . 'assets/css/admin.css', array(), EKWA_BAG_VERSION);
@@ -453,6 +462,11 @@ class EKWA_Before_After_Gallery {
         
         // Pass data via inline script for this instance
         $carousel_instance_id = $carousel_instance;
+        
+        // Custom card template
+        $custom_template_enabled = isset($carousel_settings['custom_card_template_enabled']) ? $carousel_settings['custom_card_template_enabled'] : 0;
+        $custom_card_template = isset($carousel_settings['custom_card_template']) ? $carousel_settings['custom_card_template'] : '';
+        
         $json_data = json_encode(array(
             'cases'           => $carousel_cases,
             'categories'      => $categories,
@@ -464,6 +478,8 @@ class EKWA_Before_After_Gallery {
             'autoplay'        => $autoplay ? '1' : '0',
             'autoplaySpeed'   => $autoplay_speed,
             'showLabels'      => $show_labels,
+            'customTemplateEnabled' => $custom_template_enabled ? '1' : '0',
+            'customCardTemplate'    => $custom_card_template,
         ));
         
         wp_add_inline_script('ekwa-bag-carousel', 'var ekwaBagCarousel_' . $carousel_instance_id . ' = ' . $json_data . ';', 'before');

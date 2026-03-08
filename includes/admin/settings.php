@@ -52,6 +52,8 @@ if (isset($_POST['ekwa_bag_save_settings']) && check_admin_referer('ekwa_bag_set
             'autoplay_speed'   => absint($_POST['ekwa_bag_carousel_autoplay_speed'] ?? 5000),
             'show_title'       => isset($_POST['ekwa_bag_carousel_show_title']) ? 1 : 0,
             'title_text'       => sanitize_text_field($_POST['ekwa_bag_carousel_title_text'] ?? 'Before & After Results'),
+            'custom_card_template_enabled' => isset($_POST['ekwa_bag_carousel_custom_card_template_enabled']) ? 1 : 0,
+            'custom_card_template' => isset($_POST['ekwa_bag_carousel_custom_card_template']) ? wp_kses_post($_POST['ekwa_bag_carousel_custom_card_template']) : '',
         ),
     );
     
@@ -99,6 +101,8 @@ $defaults = array(
         'autoplay_speed'   => 5000,
         'show_title'       => 1,
         'title_text'       => 'Before & After Results',
+        'custom_card_template_enabled' => 0,
+        'custom_card_template' => '',
     ),
 );
 $settings = wp_parse_args($settings, $defaults);
@@ -301,6 +305,8 @@ if ($settings['watermark_enabled']) {
                     'autoplay_speed'   => 5000,
                     'show_title'       => 1,
                     'title_text'       => 'Before & After Results',
+                    'custom_card_template_enabled' => 0,
+                    'custom_card_template' => '',
                 ));
                 ?>
 
@@ -381,6 +387,111 @@ if ($settings['watermark_enabled']) {
                     <div class="ekwa-bag-field">
                         <input type="text" name="ekwa_bag_carousel_title_text" id="ekwa_bag_carousel_title_text" value="<?php echo esc_attr($carousel['title_text']); ?>" class="regular-text">
                         <span class="description"><?php esc_html_e('The heading text shown above the carousel.', 'ekwa-before-after-gallery'); ?></span>
+                    </div>
+                </div>
+
+                <hr style="margin: 30px 0;">
+
+                <h3 style="margin-top: 0; margin-bottom: 5px;"><?php esc_html_e('Custom Card Template', 'ekwa-before-after-gallery'); ?></h3>
+                <p class="description" style="margin-bottom: 15px;"><?php esc_html_e('Use a custom HTML template for carousel cards. When disabled, the default card design is used.', 'ekwa-before-after-gallery'); ?></p>
+
+                <div class="ekwa-bag-settings-row">
+                    <label><?php esc_html_e('Enable Custom Template', 'ekwa-before-after-gallery'); ?></label>
+                    <div class="ekwa-bag-field">
+                        <label class="ekwa-bag-checkbox">
+                            <input type="checkbox" name="ekwa_bag_carousel_custom_card_template_enabled" id="ekwa_bag_carousel_custom_card_template_enabled" value="1" <?php checked(isset($carousel['custom_card_template_enabled']) ? $carousel['custom_card_template_enabled'] : 0, 1); ?>>
+                            <?php esc_html_e('Use custom HTML for carousel cards', 'ekwa-before-after-gallery'); ?>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="ekwa-bag-custom-template-section" id="ekwa-bag-custom-template-section">
+                    <div class="ekwa-bag-settings-row">
+                        <label for="ekwa_bag_carousel_custom_card_template"><?php esc_html_e('Card HTML Template', 'ekwa-before-after-gallery'); ?></label>
+                        <div class="ekwa-bag-field">
+                            <div class="ekwa-bag-template-editor-wrap" id="ekwa-bag-template-editor-wrap">
+                                <textarea name="ekwa_bag_carousel_custom_card_template" id="ekwa_bag_carousel_custom_card_template" rows="12" class="large-text code"><?php echo esc_textarea(isset($carousel['custom_card_template']) ? $carousel['custom_card_template'] : ''); ?></textarea>
+                            </div>
+                            <div id="ekwa-bag-template-errors" class="ekwa-bag-template-errors" style="display:none;"></div>
+                            <span class="description"><?php esc_html_e('The outer wrapper .ekwa-bag-carousel-slide is added automatically. Write only the inner HTML.', 'ekwa-before-after-gallery'); ?></span>
+                        </div>
+                    </div>
+
+                    <div class="ekwa-bag-template-tags-ref">
+                        <h4><?php esc_html_e('Available Template Tags', 'ekwa-before-after-gallery'); ?></h4>
+                        <table class="ekwa-bag-template-tags-table">
+                            <thead>
+                                <tr>
+                                    <th><?php esc_html_e('Tag', 'ekwa-before-after-gallery'); ?></th>
+                                    <th><?php esc_html_e('Description', 'ekwa-before-after-gallery'); ?></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>{{before_image}}</code></td>
+                                    <td><?php esc_html_e('Before image <img> tag (separate mode)', 'ekwa-before-after-gallery'); ?></td>
+                                </tr>
+                                <tr>
+                                    <td><code>{{after_image}}</code></td>
+                                    <td><?php esc_html_e('After image <img> tag (separate mode)', 'ekwa-before-after-gallery'); ?></td>
+                                </tr>
+                                <tr>
+                                    <td><code>{{combined_image}}</code></td>
+                                    <td><?php esc_html_e('Combined before/after <img> tag (single image mode)', 'ekwa-before-after-gallery'); ?></td>
+                                </tr>
+                                <tr>
+                                    <td><code>{{before_image_url}}</code></td>
+                                    <td><?php esc_html_e('Before image URL only', 'ekwa-before-after-gallery'); ?></td>
+                                </tr>
+                                <tr>
+                                    <td><code>{{after_image_url}}</code></td>
+                                    <td><?php esc_html_e('After image URL only', 'ekwa-before-after-gallery'); ?></td>
+                                </tr>
+                                <tr>
+                                    <td><code>{{combined_image_url}}</code></td>
+                                    <td><?php esc_html_e('Combined image URL only', 'ekwa-before-after-gallery'); ?></td>
+                                </tr>
+                                <tr>
+                                    <td><code>{{title}}</code></td>
+                                    <td><?php esc_html_e('Case title', 'ekwa-before-after-gallery'); ?></td>
+                                </tr>
+                                <tr>
+                                    <td><code>{{description}}</code></td>
+                                    <td><?php esc_html_e('Case description', 'ekwa-before-after-gallery'); ?></td>
+                                </tr>
+                                <tr>
+                                    <td><code>{{view_count}}</code></td>
+                                    <td><?php esc_html_e('Number of before/after sets (views)', 'ekwa-before-after-gallery'); ?></td>
+                                </tr>
+                                <tr>
+                                    <td><code>{{category}}</code></td>
+                                    <td><?php esc_html_e('Main category name', 'ekwa-before-after-gallery'); ?></td>
+                                </tr>
+                                <tr>
+                                    <td><code>{{subcategory}}</code></td>
+                                    <td><?php esc_html_e('Subcategory name', 'ekwa-before-after-gallery'); ?></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="ekwa-bag-template-examples">
+                            <h4><?php esc_html_e('Examples', 'ekwa-before-after-gallery'); ?></h4>
+                            <p class="description"><?php esc_html_e('Combined image mode:', 'ekwa-before-after-gallery'); ?></p>
+                            <pre class="ekwa-bag-template-example-code">&lt;div class="my-card"&gt;
+  {{combined_image}}
+  &lt;h3&gt;{{title}}&lt;/h3&gt;
+  &lt;span&gt;{{view_count}} views&lt;/span&gt;
+&lt;/div&gt;</pre>
+                            <p class="description"><?php esc_html_e('Separate before/after:', 'ekwa-before-after-gallery'); ?></p>
+                            <pre class="ekwa-bag-template-example-code">&lt;div class="my-card"&gt;
+  &lt;div class="images"&gt;
+    {{before_image}}
+    {{after_image}}
+  &lt;/div&gt;
+  &lt;h3&gt;{{title}}&lt;/h3&gt;
+  &lt;span&gt;{{view_count}} views&lt;/span&gt;
+&lt;/div&gt;</pre>
+                        </div>
                     </div>
                 </div>
             </div>

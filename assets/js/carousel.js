@@ -60,6 +60,8 @@
             this.autoplay = data.autoplay === '1' || data.autoplay === true;
             this.autoplaySpeed = parseInt(data.autoplaySpeed) || 5000;
             this.showLabels = data.showLabels !== undefined ? parseInt(data.showLabels) : 1;
+            this.customTemplateEnabled = data.customTemplateEnabled === '1' || data.customTemplateEnabled === true;
+            this.customCardTemplate = data.customCardTemplate || '';
 
             // Set initial responsive slides count
             this.updateSlidesToShow();
@@ -117,49 +119,117 @@
             this.cases.forEach(function(c, idx) {
                 var set = c.sets[0];
                 var isCombined = set.isCombined || false;
+                var innerHtml;
 
-                var slideImagesHtml;
-                if (isCombined) {
-                    var beforeLabel = self.showLabels ? '<span class="ekwa-bag-carousel-slide-label left">Before</span>' : '';
-                    var afterLabel = self.showLabels ? '<span class="ekwa-bag-carousel-slide-label right">After</span>' : '';
-                    slideImagesHtml = 
-                        '<div class="ekwa-bag-carousel-slide-images ekwa-bag-carousel-combined">' +
-                            '<div class="ekwa-bag-carousel-slide-img combined">' +
-                                '<img src="' + set.before + '" alt="' + (set.beforeAlt || 'Before & After') + '">' +
-                                beforeLabel + afterLabel +
-                            '</div>' +
-                        '</div>';
+                if (self.customTemplateEnabled && self.customCardTemplate) {
+                    innerHtml = self.renderCustomTemplate(c, set, isCombined);
                 } else {
-                    var bLabel = self.showLabels ? '<span class="ekwa-bag-carousel-slide-label">Before</span>' : '';
-                    var aLabel = self.showLabels ? '<span class="ekwa-bag-carousel-slide-label">After</span>' : '';
-                    slideImagesHtml = 
-                        '<div class="ekwa-bag-carousel-slide-images">' +
-                            '<div class="ekwa-bag-carousel-slide-img">' +
-                                '<img src="' + set.before + '" alt="' + (set.beforeAlt || 'Before') + '">' +
-                                bLabel +
-                            '</div>' +
-                            '<div class="ekwa-bag-carousel-separator"></div>' +
-                            '<div class="ekwa-bag-carousel-slide-img after">' +
-                                '<img src="' + set.after + '" alt="' + (set.afterAlt || 'After') + '">' +
-                                aLabel +
-                            '</div>' +
-                        '</div>';
+                    innerHtml = self.renderDefaultSlide(c, set, isCombined);
                 }
 
                 html += 
                     '<div class="ekwa-bag-carousel-slide" data-id="' + c.id + '" data-index="' + idx + '">' +
-                        slideImagesHtml +
-                        '<div class="ekwa-bag-carousel-slide-content">' +
-                            '<h3 class="ekwa-bag-carousel-slide-title">' + c.title + '</h3>' +
-                            '<div class="ekwa-bag-carousel-slide-meta">' +
-                                '<span class="ekwa-bag-carousel-slide-views"><i class="fas fa-layer-group"></i> ' + c.sets.length + ' views</span>' +
-                                '<span class="ekwa-bag-carousel-slide-action">View <i class="fas fa-arrow-right"></i></span>' +
-                            '</div>' +
-                        '</div>' +
+                        innerHtml +
                     '</div>';
             });
 
             this.elTrack.innerHTML = html;
+        }
+
+        renderCustomTemplate(c, set, isCombined) {
+            var tpl = this.customCardTemplate;
+            var beforeImgTag = '';
+            var afterImgTag = '';
+            var combinedImgTag = '';
+            var beforeUrl = set.before || '';
+            var afterUrl = set.after || '';
+
+            if (isCombined) {
+                combinedImgTag = '<img src="' + this.escAttr(beforeUrl) + '" alt="' + this.escAttr(set.beforeAlt || 'Before & After') + '">';
+                beforeImgTag = combinedImgTag;
+                afterImgTag = '';
+            } else {
+                beforeImgTag = '<img src="' + this.escAttr(beforeUrl) + '" alt="' + this.escAttr(set.beforeAlt || 'Before') + '">';
+                afterImgTag = '<img src="' + this.escAttr(afterUrl) + '" alt="' + this.escAttr(set.afterAlt || 'After') + '">';
+                combinedImgTag = beforeImgTag;
+            }
+
+            // Resolve category labels
+            var categoryLabel = '';
+            var subCategoryLabel = '';
+            if (this.categoryTree[c.mainCat]) {
+                categoryLabel = this.categoryTree[c.mainCat].label || '';
+                var subCats = this.categoryTree[c.mainCat].subCats || [];
+                var subObj = subCats.find(function(s) { return s.key === c.subCat; });
+                subCategoryLabel = subObj ? subObj.label : '';
+            }
+
+            tpl = tpl.replace(/\{\{before_image\}\}/g, beforeImgTag);
+            tpl = tpl.replace(/\{\{after_image\}\}/g, afterImgTag);
+            tpl = tpl.replace(/\{\{combined_image\}\}/g, combinedImgTag);
+            tpl = tpl.replace(/\{\{before_image_url\}\}/g, this.escAttr(beforeUrl));
+            tpl = tpl.replace(/\{\{after_image_url\}\}/g, this.escAttr(afterUrl));
+            tpl = tpl.replace(/\{\{combined_image_url\}\}/g, this.escAttr(beforeUrl));
+            tpl = tpl.replace(/\{\{title\}\}/g, this.escHtml(c.title));
+            tpl = tpl.replace(/\{\{description\}\}/g, this.escHtml(c.desc || ''));
+            tpl = tpl.replace(/\{\{view_count\}\}/g, c.sets.length);
+            tpl = tpl.replace(/\{\{category\}\}/g, this.escHtml(categoryLabel));
+            tpl = tpl.replace(/\{\{subcategory\}\}/g, this.escHtml(subCategoryLabel));
+
+            return tpl;
+        }
+
+        escAttr(str) {
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
+        }
+
+        escHtml(str) {
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(str));
+            return div.innerHTML;
+        }
+
+        renderDefaultSlide(c, set, isCombined) {
+            var self = this;
+
+            var slideImagesHtml;
+            if (isCombined) {
+                var beforeLabel = self.showLabels ? '<span class="ekwa-bag-carousel-slide-label left">Before</span>' : '';
+                var afterLabel = self.showLabels ? '<span class="ekwa-bag-carousel-slide-label right">After</span>' : '';
+                slideImagesHtml = 
+                    '<div class="ekwa-bag-carousel-slide-images ekwa-bag-carousel-combined">' +
+                        '<div class="ekwa-bag-carousel-slide-img combined">' +
+                            '<img src="' + set.before + '" alt="' + (set.beforeAlt || 'Before & After') + '">' +
+                            beforeLabel + afterLabel +
+                        '</div>' +
+                    '</div>';
+            } else {
+                var bLabel = self.showLabels ? '<span class="ekwa-bag-carousel-slide-label">Before</span>' : '';
+                var aLabel = self.showLabels ? '<span class="ekwa-bag-carousel-slide-label">After</span>' : '';
+                slideImagesHtml = 
+                    '<div class="ekwa-bag-carousel-slide-images">' +
+                        '<div class="ekwa-bag-carousel-slide-img">' +
+                            '<img src="' + set.before + '" alt="' + (set.beforeAlt || 'Before') + '">' +
+                            bLabel +
+                        '</div>' +
+                        '<div class="ekwa-bag-carousel-separator"></div>' +
+                        '<div class="ekwa-bag-carousel-slide-img after">' +
+                            '<img src="' + set.after + '" alt="' + (set.afterAlt || 'After') + '">' +
+                            aLabel +
+                        '</div>' +
+                    '</div>';
+            }
+
+            return slideImagesHtml +
+                '<div class="ekwa-bag-carousel-slide-content">' +
+                    '<h3 class="ekwa-bag-carousel-slide-title">' + c.title + '</h3>' +
+                    '<div class="ekwa-bag-carousel-slide-meta">' +
+                        '<span class="ekwa-bag-carousel-slide-views"><i class="fas fa-layer-group"></i> ' + c.sets.length + ' views</span>' +
+                        '<span class="ekwa-bag-carousel-slide-action">View <i class="fas fa-arrow-right"></i></span>' +
+                    '</div>' +
+                '</div>';
         }
 
         updateSlideWidths() {

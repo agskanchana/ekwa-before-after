@@ -1099,3 +1099,165 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Custom Card Template Section */
+.ekwa-bag-custom-template-section {
+    margin-top: 15px;
+    padding: 20px;
+    background: #f9f9f9;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+}
+
+.ekwa-bag-custom-template-section textarea {
+    width: 100%;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    tab-size: 2;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 12px;
+}
+
+.ekwa-bag-custom-template-section textarea:focus {
+    border-color: #c9a87c;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(201, 168, 124, 0.15);
+}
+
+.ekwa-bag-template-tags-ref {
+    margin-top: 20px;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.ekwa-bag-template-tags-ref h4 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.ekwa-bag-template-tags-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.ekwa-bag-template-tags-table th,
+.ekwa-bag-template-tags-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+}
+
+.ekwa-bag-template-tags-table th {
+    font-weight: 600;
+    color: #555;
+    background: #f9f9f9;
+}
+
+.ekwa-bag-template-tags-table code {
+    background: #f0ebe4;
+    color: #8b6914;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.ekwa-bag-template-examples {
+    margin-top: 15px;
+}
+
+.ekwa-bag-template-examples h4 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.ekwa-bag-template-example-code {
+    background: #2d2d2d;
+    color: #ccc;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.6;
+    overflow-x: auto;
+    margin: 8px 0 16px;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+}
+
+/* Template Editor Wrapper */
+.ekwa-bag-template-editor-wrap {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.ekwa-bag-template-editor-wrap .CodeMirror {
+    height: 280px;
+    font-size: 13px;
+    border: none;
+}
+
+.ekwa-bag-template-editor-wrap textarea {
+    width: 100%;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    tab-size: 2;
+    padding: 12px;
+    border: none;
+}
+
+/* Template Validation Errors */
+.ekwa-bag-template-errors {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-top: 10px;
+    color: #991b1b;
+    font-size: 13px;
+}
+
+.ekwa-bag-template-error-icon .dashicons {
+    color: #dc2626;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+}
+
+.ekwa-bag-template-errors ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ekwa-bag-template-errors li {
+    margin-bottom: 4px;
+    line-height: 1.5;
+}
+
+.ekwa-bag-template-errors li:last-child {
+    margin-bottom: 0;
+}
+
+.ekwa-bag-template-errors code {
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+}
