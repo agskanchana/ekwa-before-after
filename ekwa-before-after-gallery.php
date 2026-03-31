@@ -173,6 +173,8 @@ class EKWA_Before_After_Gallery {
                 'add_new_item'  => __('Add New Category', 'ekwa-before-after-gallery'),
             ),
             'hierarchical' => true,
+            'public'       => false,
+            'publicly_queryable' => false,
             'show_ui'      => true,
             'show_admin_column' => true,
             'rewrite'      => false,
