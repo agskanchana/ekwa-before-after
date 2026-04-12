@@ -291,7 +291,134 @@ if ($settings['watermark_enabled']) {
         <div class="ekwa-bag-tab-content" data-tab="carousel">
             <div class="ekwa-bag-settings-section">
                 <h2><?php esc_html_e('Category Carousel Settings', 'ekwa-before-after-gallery'); ?></h2>
-                <p class="description"><?php esc_html_e('Configure the category carousel defaults. Build your shortcode from the Dashboard page.', 'ekwa-before-after-gallery'); ?></p>
+                <p class="description"><?php esc_html_e('Configure the category carousel defaults and build your shortcode.', 'ekwa-before-after-gallery'); ?></p>
+
+                <!-- Shortcode Builder -->
+                <?php
+                $all_categories = get_terms(array(
+                    'taxonomy'   => 'ekwa_bag_category',
+                    'hide_empty' => false,
+                ));
+                if (is_wp_error($all_categories)) {
+                    $all_categories = array();
+                }
+                ?>
+                <div class="ekwa-bag-shortcode-builder-section">
+                    <h3 style="margin-top: 0; margin-bottom: 5px;"><?php esc_html_e('Shortcode Builder', 'ekwa-before-after-gallery'); ?></h3>
+                    <p class="description" style="margin-bottom: 15px;"><?php esc_html_e('Build your carousel shortcode. If no category is selected, it auto-detects from the page slug.', 'ekwa-before-after-gallery'); ?></p>
+
+                    <div class="ekwa-bag-shortcode-builder">
+                        <!-- Row 1: Category + Limits -->
+                        <div class="ekwa-bag-builder-group">
+                            <h4 class="ekwa-bag-builder-group-title"><span class="dashicons dashicons-category"></span> <?php esc_html_e('Content', 'ekwa-before-after-gallery'); ?></h4>
+                            <div class="ekwa-bag-builder-row">
+                                <div class="ekwa-bag-builder-field ekwa-bag-builder-field-wide">
+                                    <label for="ekwa-sc-category"><?php esc_html_e('Category', 'ekwa-before-after-gallery'); ?></label>
+                                    <select id="ekwa-sc-category">
+                                        <option value=""><?php esc_html_e('Auto-detect from page slug', 'ekwa-before-after-gallery'); ?></option>
+                                        <option value="all"><?php esc_html_e('All (show category filter tabs)', 'ekwa-before-after-gallery'); ?></option>
+                                        <?php foreach ($all_categories as $cat) : ?>
+                                            <option value="<?php echo esc_attr($cat->slug); ?>">
+                                                <?php echo esc_html($cat->name); ?>
+                                                <?php if ($cat->parent) : ?>
+                                                    <?php
+                                                    $parent = get_term($cat->parent, 'ekwa_bag_category');
+                                                    if ($parent && !is_wp_error($parent)) {
+                                                        echo ' (' . esc_html($parent->name) . ')';
+                                                    }
+                                                    ?>
+                                                <?php endif; ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                                <div class="ekwa-bag-builder-field">
+                                    <label for="ekwa-sc-limit"><?php esc_html_e('Max Items', 'ekwa-before-after-gallery'); ?></label>
+                                    <select id="ekwa-sc-limit">
+                                        <option value=""><?php esc_html_e('All', 'ekwa-before-after-gallery'); ?></option>
+                                        <option value="3">3</option>
+                                        <option value="5">5</option>
+                                        <option value="8">8</option>
+                                        <option value="10">10</option>
+                                        <option value="15">15</option>
+                                        <option value="20">20</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Responsive slides per view -->
+                        <div class="ekwa-bag-builder-group">
+                            <h4 class="ekwa-bag-builder-group-title"><span class="dashicons dashicons-desktop"></span> <?php esc_html_e('Slides Per View', 'ekwa-before-after-gallery'); ?></h4>
+                            <div class="ekwa-bag-builder-row ekwa-bag-builder-row-3">
+                                <div class="ekwa-bag-builder-field">
+                                    <label for="ekwa-sc-perpage"><?php esc_html_e('Desktop', 'ekwa-before-after-gallery'); ?></label>
+                                    <select id="ekwa-sc-perpage">
+                                        <option value=""><?php esc_html_e('Default', 'ekwa-before-after-gallery'); ?></option>
+                                        <?php for ($i = 1; $i <= 6; $i++) : ?>
+                                            <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                        <?php endfor; ?>
+                                    </select>
+                                </div>
+                                <div class="ekwa-bag-builder-field">
+                                    <label for="ekwa-sc-perpage-tablet"><?php esc_html_e('Tablet', 'ekwa-before-after-gallery'); ?></label>
+                                    <select id="ekwa-sc-perpage-tablet">
+                                        <option value=""><?php esc_html_e('Default', 'ekwa-before-after-gallery'); ?></option>
+                                        <?php for ($i = 1; $i <= 4; $i++) : ?>
+                                            <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                        <?php endfor; ?>
+                                    </select>
+                                </div>
+                                <div class="ekwa-bag-builder-field">
+                                    <label for="ekwa-sc-perpage-mobile"><?php esc_html_e('Mobile', 'ekwa-before-after-gallery'); ?></label>
+                                    <select id="ekwa-sc-perpage-mobile">
+                                        <option value=""><?php esc_html_e('Default', 'ekwa-before-after-gallery'); ?></option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Controls -->
+                        <div class="ekwa-bag-builder-group">
+                            <h4 class="ekwa-bag-builder-group-title"><span class="dashicons dashicons-admin-settings"></span> <?php esc_html_e('Controls', 'ekwa-before-after-gallery'); ?></h4>
+                            <div class="ekwa-bag-builder-row ekwa-bag-builder-row-3">
+                                <div class="ekwa-bag-builder-field">
+                                    <label for="ekwa-sc-arrows"><?php esc_html_e('Arrows', 'ekwa-before-after-gallery'); ?></label>
+                                    <select id="ekwa-sc-arrows">
+                                        <option value=""><?php esc_html_e('Default', 'ekwa-before-after-gallery'); ?></option>
+                                        <option value="yes"><?php esc_html_e('Yes', 'ekwa-before-after-gallery'); ?></option>
+                                        <option value="no"><?php esc_html_e('No', 'ekwa-before-after-gallery'); ?></option>
+                                    </select>
+                                </div>
+                                <div class="ekwa-bag-builder-field">
+                                    <label for="ekwa-sc-dots"><?php esc_html_e('Dots', 'ekwa-before-after-gallery'); ?></label>
+                                    <select id="ekwa-sc-dots">
+                                        <option value=""><?php esc_html_e('Default', 'ekwa-before-after-gallery'); ?></option>
+                                        <option value="yes"><?php esc_html_e('Yes', 'ekwa-before-after-gallery'); ?></option>
+                                        <option value="no"><?php esc_html_e('No', 'ekwa-before-after-gallery'); ?></option>
+                                    </select>
+                                </div>
+                                <div class="ekwa-bag-builder-field">
+                                    <label for="ekwa-sc-autoplay"><?php esc_html_e('Autoplay', 'ekwa-before-after-gallery'); ?></label>
+                                    <select id="ekwa-sc-autoplay">
+                                        <option value=""><?php esc_html_e('Default', 'ekwa-before-after-gallery'); ?></option>
+                                        <option value="yes"><?php esc_html_e('Yes', 'ekwa-before-after-gallery'); ?></option>
+                                        <option value="no"><?php esc_html_e('No', 'ekwa-before-after-gallery'); ?></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="ekwa-bag-shortcode-box" style="margin-top: 15px;">
+                            <code id="ekwa-sc-output">[ekwa_category_carousel]</code>
+                            <button type="button" class="ekwa-bag-copy-btn"><?php esc_html_e('Copy', 'ekwa-before-after-gallery'); ?></button>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="margin: 30px 0;">
 
                 <?php
                 $carousel = isset($settings['carousel']) ? $settings['carousel'] : array();

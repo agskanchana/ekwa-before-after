@@ -31,7 +31,7 @@ $myUpdateChecker->setBranch('main');
 
 
 //  plugin constants
-define('EKWA_BAG_VERSION', '1.4.0');
+define('EKWA_BAG_VERSION', '1.4.1');
 define('EKWA_BAG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('EKWA_BAG_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -425,7 +425,11 @@ class EKWA_Before_After_Gallery {
         
         // Auto-detect category from page slug if not set
         $category_slug = $atts['category'];
-        if (empty($category_slug)) {
+        $show_category_filter = false;
+        if ($category_slug === 'all') {
+            $category_slug = ''; // Fetch all cases
+            $show_category_filter = true;
+        } elseif (empty($category_slug)) {
             $category_slug = $this->detect_category_from_page_slug();
         }
         
@@ -480,6 +484,7 @@ class EKWA_Before_After_Gallery {
             'autoplay'        => $autoplay ? '1' : '0',
             'autoplaySpeed'   => $autoplay_speed,
             'showLabels'      => $show_labels,
+            'showCategoryFilter' => $show_category_filter ? '1' : '0',
             'customTemplateEnabled' => $custom_template_enabled ? '1' : '0',
             'customCardTemplate'    => $custom_card_template,
         ));

@@ -28,6 +28,9 @@ $wrapper_class = 'ekwa-bag-carousel-wrapper' . ($custom_tpl_enabled ? ' ekwa-bag
     <h2 class="ekwa-bag-carousel-title"><?php echo esc_html($carousel_title_text); ?></h2>
     <?php endif; ?>
 
+    <!-- Category Filter Tabs (rendered by JS when category=all) -->
+    <div class="ekwa-bag-carousel-filter-tabs" style="display:none;"></div>
+
     <?php if (empty($carousel_cases)) : ?>
         <div class="ekwa-bag-carousel-empty">
             <i class="fas fa-images"></i>

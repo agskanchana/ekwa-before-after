@@ -37,6 +37,10 @@
             this.currentViewIdx = 0;
             this.categoryTree = {};
 
+            // Filter state
+            this.allCases = [];
+            this.activeFilter = 'all';
+
             this.init();
         }
 
@@ -60,13 +64,23 @@
             this.autoplay = data.autoplay === '1' || data.autoplay === true;
             this.autoplaySpeed = parseInt(data.autoplaySpeed) || 5000;
             this.showLabels = data.showLabels !== undefined ? parseInt(data.showLabels) : 1;
+            this.showCategoryFilter = data.showCategoryFilter === '1' || data.showCategoryFilter === true;
             this.customTemplateEnabled = data.customTemplateEnabled === '1' || data.customTemplateEnabled === true;
             this.customCardTemplate = data.customCardTemplate || '';
 
             // Set initial responsive slides count
             this.updateSlidesToShow();
 
+            // Store all cases for filtering
+            this.allCases = this.cases.slice();
+
             this.cacheElements();
+
+            // Render category filter tabs if enabled
+            if (this.showCategoryFilter) {
+                this.renderCategoryFilter();
+            }
+
             this.render();
             this.bindEvents();
 
@@ -101,6 +115,115 @@
             this.elNext = qs('.ekwa-bag-carousel-arrow.next', this.wrapper);
             this.elDots = qs('.ekwa-bag-carousel-dots', this.wrapper);
             this.elModal = qs('.ekwa-bag-carousel-modal', this.wrapper);
+            this.elFilterTabs = qs('.ekwa-bag-carousel-filter-tabs', this.wrapper);
+        }
+
+        renderCategoryFilter() {
+            if (!this.elFilterTabs) return;
+
+            var self = this;
+
+            // Build category counts from all cases
+            var catCounts = {};
+            var totalCount = this.allCases.length;
+
+            this.allCases.forEach(function(c) {
+                // Use the categories the case belongs to
+                var terms = [];
+                if (c.mainCat && c.mainCat !== 'uncategorized') terms.push(c.mainCat);
+                if (c.subCat) terms.push(c.subCat);
+
+                terms.forEach(function(slug) {
+                    catCounts[slug] = (catCounts[slug] || 0) + 1;
+                });
+            });
+
+            // Build tabs: "All" first, then categories that have cases
+            var html = '<button class="ekwa-bag-carousel-filter-tab active" data-filter="all">All <span class="ekwa-bag-carousel-filter-count">' + totalCount + '</span></button>';
+
+            // Gather unique leaf categories (subcategories, or parent cats with no subcategory assignments)
+            var displayedCats = {};
+            this.allCases.forEach(function(c) {
+                // Prefer subcategory if present, otherwise use main category
+                var catSlug = c.subCat || c.mainCat;
+                if (catSlug && catSlug !== 'uncategorized' && !displayedCats[catSlug]) {
+                    // Find label from category tree
+                    var label = catSlug;
+                    var count = 0;
+
+                    // Count cases that match this specific category
+                    self.allCases.forEach(function(cs) {
+                        if (cs.subCat === catSlug || (!cs.subCat && cs.mainCat === catSlug)) {
+                            count++;
+                        }
+                    });
+
+                    // Resolve label from categoryTree
+                    for (var parentKey in self.categoryTree) {
+                        var cat = self.categoryTree[parentKey];
+                        if (parentKey === catSlug) {
+                            label = cat.label;
+                            break;
+                        }
+                        if (cat.subCats) {
+                            var sub = cat.subCats.find(function(s) { return s.key === catSlug; });
+                            if (sub) {
+                                label = sub.label;
+                                break;
+                            }
+                        }
+                    }
+
+                    displayedCats[catSlug] = { label: label, count: count };
+                }
+            });
+
+            for (var slug in displayedCats) {
+                var cat = displayedCats[slug];
+                html += '<button class="ekwa-bag-carousel-filter-tab" data-filter="' + this.escAttr(slug) + '">' +
+                    this.escHtml(cat.label) + ' <span class="ekwa-bag-carousel-filter-count">' + cat.count + '</span></button>';
+            }
+
+            this.elFilterTabs.innerHTML = html;
+            this.elFilterTabs.style.display = '';
+
+            // Bind filter tab clicks
+            this.elFilterTabs.addEventListener('click', function(e) {
+                var tab = e.target.closest('.ekwa-bag-carousel-filter-tab');
+                if (!tab) return;
+
+                var filter = tab.dataset.filter;
+                self.activeFilter = filter;
+
+                // Update active state
+                qsa('.ekwa-bag-carousel-filter-tab', self.elFilterTabs).forEach(function(t) {
+                    t.classList.toggle('active', t === tab);
+                });
+
+                // Filter cases and re-render
+                self.filterCases(filter);
+            });
+        }
+
+        filterCases(filter) {
+            var self = this;
+
+            if (filter === 'all') {
+                this.cases = this.allCases.slice();
+            } else {
+                this.cases = this.allCases.filter(function(c) {
+                    return c.subCat === filter || (!c.subCat && c.mainCat === filter);
+                });
+            }
+
+            // Reset slide position
+            this.currentSlide = 0;
+            this.updateSlidesToShow();
+            this.render();
+            this.stopAutoplay();
+            if (this.autoplay && this.cases.length > this.slidesToShow) {
+                this.startAutoplay();
+            }
         }
 
         render() {
